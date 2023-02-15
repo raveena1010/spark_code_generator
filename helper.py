@@ -19,6 +19,7 @@ def cleanse_data(str):
     return re.sub(r'[\[\]\'\"\(\)\{\}]', '', str)
 
 def remove_space(list_data):
+    cleaned_data = []
     for i in range(len(list_data)):
         list_data[i] = list_data[i].strip()
     return list_data

@@ -1,0 +1,224 @@
+{
+  "workflow": {
+    "nodes": [{
+      "id": "0a8842ee-b0ab-d40b-12b8-c123cdded4d5",
+      "operation": {
+        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
+        "name": "Filter Rows"
+      },
+      "parameters": {
+        "condition": "month = \"April\" or month = \"June\""
+      }
+    }, {
+      "id": "cddad07e-cd1b-f903-c371-48eb4689e3d7",
+      "operation": {
+        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
+        "name": "Filter Columns"
+      },
+      "parameters": {
+        "selected columns": {
+          "selections": [{
+            "type": "indexRange",
+            "values": [1, 3]
+          }, {
+            "type": "indexRange",
+            "values": [3, 5]
+          }, {
+            "type": "typeList",
+            "values": ["numeric"]
+          }],
+          "excluding": false
+        }
+      }
+    }, {
+      "id": "5d817900-79fc-deee-270b-f8ced9856df2",
+      "operation": {
+        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
+        "name": "SQL Column Transformation"
+      },
+      "parameters": {
+        "operate on": {
+          "one column": {
+            "input column": {
+              "type": "column",
+              "value": "advertising_id"
+            }
+          }
+        }
+      }
+    }, {
+      "id": "f169c94d-8511-2eb3-e378-4478a1a53603",
+      "operation": {
+        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
+        "name": "Read DataFrame"
+      },
+      "parameters": {
+        "data source": "635c427e-a648-6fb6-5328-255607f847b9"
+      }
+    }, {
+      "id": "841c39e0-2118-14e2-1aac-6e4afe61f2d0",
+      "operation": {
+        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
+        "name": "Filter Columns"
+      },
+      "parameters": {
+        "selected columns": {
+          "selections": [{
+            "type": "columnList",
+            "values": ["masked_user_id", "masked_advertising_id"]
+          }],
+          "excluding": true
+        }
+      }
+    }, {
+      "id": "3568ae57-a848-23d3-f1dd-6f263ba12aa4",
+      "operation": {
+        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
+        "name": "Filter Rows"
+      },
+      "parameters": {
+        "condition": "location_category in ('US East', 'Asia Pasific')"
+      }
+    }],
+    "connections": [{
+      "from": {
+        "nodeId": "841c39e0-2118-14e2-1aac-6e4afe61f2d0",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "3568ae57-a848-23d3-f1dd-6f263ba12aa4",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "f169c94d-8511-2eb3-e378-4478a1a53603",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "cddad07e-cd1b-f903-c371-48eb4689e3d7",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "f169c94d-8511-2eb3-e378-4478a1a53603",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "0a8842ee-b0ab-d40b-12b8-c123cdded4d5",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "0a8842ee-b0ab-d40b-12b8-c123cdded4d5",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "841c39e0-2118-14e2-1aac-6e4afe61f2d0",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "f169c94d-8511-2eb3-e378-4478a1a53603",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "5d817900-79fc-deee-270b-f8ced9856df2",
+        "portIndex": 0
+      }
+    }]
+  },
+  "thirdPartyData": {
+    "gui": {
+      "name": "act_cs",
+      "description": "",
+      "nodes": {
+        "f169c94d-8511-2eb3-e378-4478a1a53603": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 6022,
+            "y": 7736
+          }
+        },
+        "3568ae57-a848-23d3-f1dd-6f263ba12aa4": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 5742,
+            "y": 8139
+          }
+        },
+        "5d817900-79fc-deee-270b-f8ced9856df2": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 5976,
+            "y": 7971
+          }
+        },
+        "cddad07e-cd1b-f903-c371-48eb4689e3d7": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 6197,
+            "y": 7872
+          }
+        },
+        "841c39e0-2118-14e2-1aac-6e4afe61f2d0": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 5746,
+            "y": 8014
+          }
+        },
+        "0a8842ee-b0ab-d40b-12b8-c123cdded4d5": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 5735,
+            "y": 7876
+          }
+        }
+      }
+    },
+    "notebooks": {
+
+    },
+    "datasources": [{
+      "accessLevel": "writeRead",
+      "params": {
+        "name": "act_data",
+        "libraryFileParams": null,
+        "downloadUri": null,
+        "googleSpreadsheetParams": null,
+        "jdbcParams": null,
+        "hdfsParams": null,
+        "externalFileParams": {
+          "url": "https://2weeks-landingbucket.s3.amazonaws.com/Actives_Staged_Result.csv",
+          "fileFormat": "csv",
+          "csvFileFormatParams": {
+            "includeHeader": true,
+            "convert01ToBoolean": false,
+            "separatorType": "comma",
+            "customSeparator": null
+          }
+        },
+        "datasourceType": "externalFile",
+        "visibility": "privateVisibility"
+      },
+      "creationDateTime": "2023-02-14T09:41:28.679Z",
+      "id": "635c427e-a648-6fb6-5328-255607f847b9",
+      "ownerName": "user",
+      "ownerId": "00000000-0000-0000-0000-000000000001"
+    }]
+  },
+  "variables": {
+
+  },
+  "id": "f91bd7d8-8702-4a51-94f4-2735ed718b98",
+  "metadata": {
+    "type": "batch",
+    "apiVersion": "1.4.3"
+  }
+}

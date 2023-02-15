@@ -4,7 +4,8 @@ operations_dict = { "012876d9-7a72-47f9-98e4-8ed26db14d6d" : "sql_column_transfo
             "e76ca616-0322-47a5-b390-70c9668265dd" : "python_notebook",
             "6cba4400-d966-4a2a-8356-b37f37b4c73f" : "sql_transformation",
             "6534f3f4-fa3a-49d9-b911-c213d3da8b5d" : "filter_columns",
-            "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a" :  "filter_rows"
+            "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a" :  "filter_rows",
+            "06374446-3138-4cf7-9682-f884990f3a60" :  "inner_join"
             }
 
 separator = { "comma" : ',',

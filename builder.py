@@ -19,7 +19,9 @@ def set_df_name_for_child(self, node, name):
         children = self.pn_obj.relation_dict[node]
         if len(children) > 1:
             for i in range(len(children)):
-                self.dataframe_name[children[i]] = name + '-0' + str(i)
+                child_df_name = name + '_b' + str(i)
+                self.dataframe_name[children[i]] = child_df_name
+                self.code_file.write(f'{child_df_name}= {name}'+ '\n')
         else:
             self.dataframe_name[children[0]] = name
 

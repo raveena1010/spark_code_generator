@@ -37,7 +37,6 @@ class Generate_SparkCode:
             operation_id = node_details['operation']['id']
             operation_to_do = operations_dict[operation_id]
             fun_to_call = [operation_to_do, node_details, data]
-            print(fun_to_call)
             delegate_operation.Node_Operation.get_case(del_obj, fun_to_call)
             self.visited[node_id] = True
 
@@ -62,7 +61,6 @@ class Generate_SparkCode:
 
 
 job = Generate_SparkCode()
-#print(pn_obj.operations)
-print(del_obj.dataframe_name)
-print(del_obj.cached_df_schema)
+print("Updated df" , del_obj.dataframe_name)
+print("Schema: ",del_obj.cached_df_schema)
 
