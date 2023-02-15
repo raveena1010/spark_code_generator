@@ -1,8 +1,0 @@
-act_data = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv("https://2weeks-landingbucket.s3.amazonaws.com/Actives_Staged_Result.csv")
-act_data_b0= act_data
-act_data_b1= act_data
-act_data_b2= act_data
-act_data_b0 = act_data_b0.select(['user_latitude', 'city', 'state', 'location_granularities', 'location_source', 'user_longitude', 'timestamp', 'location_category'])
-act_data_b1 = act_data_b1.filter('month = "April" or month = "June"')
-act_data_b1 = act_data_b1.select(['user_latitude', 'date', 'city', 'advertising_id', 'state', 'location_granularities', 'location_source', 'user_id', 'month', 'user_longitude', 'timestamp', 'location_category'])
-act_data_b1 = act_data_b1.filter('location_category in ("US East", "Asia Pasific")')

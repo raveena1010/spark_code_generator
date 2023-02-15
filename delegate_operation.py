@@ -43,17 +43,18 @@ class Node_Operation:
             data_from = datasource['params']['datasourceType'] + "Params"
             file_format = datasource['params'][data_from]['fileFormat']
             datasource_name = datasource['params']['name']
-            url = '"' + datasource['params'][data_from]['url'] + '"'
-            if 'library' in url:
+            if 'library' in data_from:
                 url = input("Give file location of {0} data ".format(datasource_name)).strip()
                 url = cleanse_data(url)
+            else:
+                url = '"' + datasource['params'][data_from]['url'] + '"'   
             columns = self.get_schema_details_from_user(datasource_name)
             if file_format == "csv":
                 include_header = datasource['params'][data_from]['csvFileFormatParams']['includeHeader']
                 separator_type = separator[datasource['params'][data_from]['csvFileFormatParams']['separatorType']]
                 if not separator_type:
                     separator_type = datasource['params'][data_from]['csvFileFormatParams']['customSeparator']
-                code = f"{datasource_name} = spark.read.option('header',{include_header}).option('delimiter','{separator_type}').option('inferSchema',True).csv({url})"
+                code = f"{datasource_name} = spark.read.option('header',{include_header}).option('delimiter','{separator_type}').option('inferSchema',True).csv('{url}')"
             else:
                 code = f"{datasource_name} = spark.read.{file_format}('{url}')"
 
@@ -79,6 +80,7 @@ class Node_Operation:
         self.dataframe_name[node['id']] = datasource_name
         self.code_file.write(code + '\n')
         set_df_name_for_child(self,node_id, datasource_name)
+        add_child_in_output(self,node_id,datasource_name)
 
 
     def write_dataframe(self, node):
@@ -95,7 +97,7 @@ class Node_Operation:
             if 'library' in url:
                 url = input("Give file location of {0} data ".format(datasource_name)).strip()
                 url = cleanse_data(url)
-            code = f"{df_name}.write.{file_format}.path({url})"
+            code = f"{df_name}.write.{file_format}.path('{url}')"
 
         else:
             url = input(f"Give file location to save {df_name}").strip()
@@ -111,29 +113,7 @@ class Node_Operation:
             else:
                 code = f"{df_name} = spark.read.{file_format}('{url}')"
         self.code_file.write(code + '\n')
-
-
-    def sql_column_transformation(self, node):
-        pass
-
-    def above_fun(self,node):
-        if 'one column' in node['parameters']['operate on']:
-            col = node['parameters']['operate on']['one column']['input column']['value']
-            x = node['parameters']['formula'].replace('x', col)
-            self.code_file.write("df.withColumn(f.{0})".format(x) + '\n')
-        if 'one column' not in node['parameters']['operate on']:
-            cols = node['parameters']['operate on']['multiple columns']['input columns']['selections'][0]['values']
-            for a in cols:
-                x = node['parameters']['formula'].replace('decimal_col', a)
-                self.code_file.write("df.withColumn(f.{0})".format(x) + '\n')
-        node_id = node['id']
-        set_df_name_for_child(self,node_id, self.dataframe_name[node_id])
-
-    def sql_transformation(self, node):
-        self.code_file.write(node['parameters']['expression'])
-        node_id = node['id']
-        set_df_name_for_child(self,node_id, self.dataframe_name[node_id])
-        pass
+        add_child_in_output(self,node_id,df_name) #not needed
 
     def filter_rows(self, node):
         node_id = node['id']
@@ -148,6 +128,7 @@ class Node_Operation:
         parent_name = self.dataframe_name[parents_id[0]]
         schema = self.cached_df_schema[parent_name]
         self.cached_df_schema[df_name] = schema
+        add_child_in_output(self,node_id,self.dataframe_name[node_id])
 
 
     def filter_columns(self, node):
@@ -182,7 +163,8 @@ class Node_Operation:
         required_cols = list(set(required_cols))
         code = "{0} = {1}.select({2})".format(df_name, df_name, required_cols)
         self.code_file.write(code + '\n')
-        update_schema(self,schema, required_cols, df_name)     
+        update_schema(self,schema, required_cols, df_name)
+        add_child_in_output(self,node_id,df_name)    
 
     def filter_col_bylist(self,df_name, values, is_exclude, schema):
         cols = list(schema.keys())
@@ -195,8 +177,6 @@ class Node_Operation:
             cols_to_add = values
         return cols_to_add
     
-    def inner_join(self,node):
-        pass
 
     def filter_col_bytype(self,df_name,values,is_exclude,schema):
         datatype_match = compare_datatype(schema)
@@ -231,14 +211,11 @@ class Node_Operation:
             cols_to_remove = list(set(cols_to_remove))
             for i in cols:
                 if i not in cols_to_remove:
-                    cols_to_add.append(i)
+                    cols_to_add.append(i)          
         return cols_to_add
 
 
 
-
-    def python_notebook(self, node):
-        print(node)
 
     def call_method(self, operation_to_do, node_detail):
         method = operation_to_do

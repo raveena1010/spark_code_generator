@@ -14,20 +14,29 @@ def generate_dataframe_name(self):
         self.dataframe_name[node_id] = 'df'
 
 #Set the df_name for children of given node
-def set_df_name_for_child(self, node, name):
-    if node in self.pn_obj.relation_dict:
-        children = self.pn_obj.relation_dict[node]
+def set_df_name_for_child(self, node_id, name):
+    if node_id in self.pn_obj.relation_dict:
+        children = self.pn_obj.relation_dict[node_id]
         if len(children) > 1:
             for i in range(len(children)):
                 child_df_name = name + '_b' + str(i)
                 self.dataframe_name[children[i]] = child_df_name
-                self.code_file.write(f'{child_df_name}= {name}'+ '\n')
         else:
             self.dataframe_name[children[0]] = name
+
+def add_child_in_output(self,node_id,name):
+    if node_id in self.pn_obj.relation_dict:
+        children = self.pn_obj.relation_dict[node_id]
+        if len(children) > 1:
+            for i in range(len(children)):
+                child_df_name = name + '_b' + str(i)
+                self.code_file.write(f'{child_df_name}= {name}'+ '\n')
+
 
 #Update the schema detail
 def update_schema(self,schema,cols_to_add,df_name):
     new_schema = {}
-    for i in cols_to_add:
-        new_schema[i] = schema[i]
+    for i in schema:
+        if i in cols_to_add:
+            new_schema[i] = schema[i]
     self.cached_df_schema[df_name] = new_schema

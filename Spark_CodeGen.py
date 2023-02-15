@@ -5,7 +5,7 @@ import root_node
 
 workflow_path = 'Workflow_CaseStudy.json'
 f = open(workflow_path)
-code_file = open('output_path', 'w')
+code_file = open('code_output', 'w')
 
 data = json.load(f)
 pn_obj = root_node.Get_Root_Node(data)
@@ -47,7 +47,7 @@ class Generate_SparkCode:
         self.visited[node] = True
         while queue:
             s = queue.pop(0)
-            print('ofe', s)
+            print('order of execution', s)
             if s in pn_obj.relation_dict:
                 for child in pn_obj.relation_dict[s]:
                     if not self.visited[child]:
@@ -61,6 +61,4 @@ class Generate_SparkCode:
 
 
 job = Generate_SparkCode()
-print("Updated df" , del_obj.dataframe_name)
-print("Schema: ",del_obj.cached_df_schema)
 
