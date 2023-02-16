@@ -1,0 +1,23 @@
+For every operation
+1) we need to set df_name for child if it have brach it has effect 
+    node_id = node['id']
+    df_name = self.dataframe_name[node_id]  
+    set_df_name_for_child(self,node_id,df_name)
+
+
+2) If branch is there then add it in code file
+add_child_in_output(self,node_id,self.dataframe_name[node_id])
+
+3)Get the parent of this and update that as schema as no change in cols
+This is required as df_name might change with branching but not the schema 
+parents_id = self.pn_obj.child_parent[node_id]
+parent_name = self.dataframe_name[parents_id[0]]
+schema = self.cached_df_schema[parent_name]
+self.cached_df_schema[df_name] = schema
+
+                       (or)
+4)Schema will be reflected with filter col ,  join operation etc
+update_schema(self,schema, required_cols, df_name)
+
+
+

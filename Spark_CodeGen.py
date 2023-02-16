@@ -61,4 +61,5 @@ class Generate_SparkCode:
 
 
 job = Generate_SparkCode()
+print(job.del_obj.cached_df_schema)
 

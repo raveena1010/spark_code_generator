@@ -44,8 +44,9 @@ class Node_Operation:
             file_format = datasource['params'][data_from]['fileFormat']
             datasource_name = datasource['params']['name']
             if 'library' in data_from:
-                url = input("Give file location of {0} data ".format(datasource_name)).strip()
-                url = cleanse_data(url)
+                url = 'loc'
+                #url = input("Give file location of {0} data ".format(datasource_name)).strip()
+                #url = cleanse_data(url)
             else:
                 url = '"' + datasource['params'][data_from]['url'] + '"'   
             columns = self.get_schema_details_from_user(datasource_name)
@@ -117,8 +118,8 @@ class Node_Operation:
 
     def filter_rows(self, node):
         node_id = node['id']
-        set_df_name_for_child(self,node_id, self.dataframe_name[node_id])
         df_name = self.dataframe_name[node_id]
+        set_df_name_for_child(self,node_id,df_name)
         condition = node["parameters"]['condition']
         condition = condition.replace("'",'"')
         code = f"{df_name} = {df_name}.filter('{condition}')"
@@ -163,7 +164,7 @@ class Node_Operation:
         required_cols = list(set(required_cols))
         code = "{0} = {1}.select({2})".format(df_name, df_name, required_cols)
         self.code_file.write(code + '\n')
-        update_schema(self,schema, required_cols, df_name)
+        update_schema_after_filtercol(self,schema, required_cols, df_name)
         add_child_in_output(self,node_id,df_name)    
 
     def filter_col_bylist(self,df_name, values, is_exclude, schema):
@@ -215,6 +216,86 @@ class Node_Operation:
         return cols_to_add
 
 
+    def join(self,node):
+        node_id = node['id']
+        join_type = list(node["parameters"]["join type"].keys())[0]
+        left_prefix = node["parameters"].get("left prefix",'')
+        right_prefix = node["parameters"].get("right prefix",'')
+        join_columns =  node["parameters"].get("join columns")
+        parents_id = self.pn_obj.child_parent[node_id]
+        left_parent_name , right_parent_name  =self.find_left_right_parent(node_id,parents_id)
+        left_parent_schema = self.cached_df_schema[left_parent_name]
+        right_parent_schema = self.cached_df_schema[right_parent_name]
+        self.dataframe_name[node_id] = left_parent_name+right_parent_name+'join'
+        df_name = self.dataframe_name[node_id]
+        set_df_name_for_child(self,node_id,df_name)
+        leftcols = list(left_parent_schema.keys())
+        rightcols = list(right_parent_schema.keys()) 
+        condition,cols_to_remove = self.get_join_condition(leftcols,rightcols,join_columns,left_parent_name,right_parent_name)
+        self.match_join_type(join_type,left_parent_name,right_parent_name,condition,{df_name})
+        if left_prefix :
+            left_cols = [left_prefix+'.'+col for col in leftcols]
+        if right_prefix:
+            right_cols = [right_prefix+'.'+col for col in rightcols]
+        update_schema_after_join(self,left_parent_schema,right_parent_schema,left_cols,right_cols,cols_to_remove,df_name)
+    
+
+    def get_join_condition(self,leftcols,rightcols,join_columns,left_parent,right_parent):
+        condition = ''
+        cols_to_remove = []
+        for con in join_columns:
+            if con["left column"]['type'] == 'column':
+                left_col_for_join =  con["left column"]['value'] 
+    
+            if con["right column"]['type'] == 'column':
+                right_col_for_join =  con["right column"]['value'] 
+
+            if con["left column"]['type'] == 'index':
+                left_col_for_join = leftcols[con["left column"]['value']]
+
+            if con["right column"]['type'] == 'index':
+                right_col_for_join = rightcols[con["right column"]['value']] 
+
+            left_col_for_join = left_parent + '.' +left_col_for_join 
+            right_col_for_join = right_parent + '.' + right_col_for_join
+            cols_to_remove.append(right_col_for_join)
+            if con == len(join_columns):
+                condition  = condition + f"{left_col_for_join}=={right_col_for_join}"
+            else:
+                condition  = condition + f"{left_col_for_join}=={right_col_for_join}"  + ','    
+
+        return condition,cols_to_remove
+
+
+    #df = Stockcompanies.join(stock_price_less_memoryused,[Stockcompanies.Ticker_symbol== stock_price_less_memoryused.symbol],'outer')
+    def match_join_type(self,join_type,left_parent_name,right_parent_name,condition,df_name):
+        if join_type == 'Join':
+            code = f"{df_name} = {left_parent_name}.join({right_parent_name},[{condition}],'inner')"
+        if join_type == "Outer":
+            code = f"{df_name}={left_parent_name}.join({right_parent_name},[{condition}],'outer')"
+        if join_type =="Left outer":
+            code = f"{df_name}={left_parent_name}.join({right_parent_name},[{condition}],'left_outer')"
+        if join_type == "Right outer":
+            code = f"{df_name} = {left_parent_name}.join({right_parent_name},[{condition}],'right_outer')"
+        self.code_file.write(code + '\n')   
+        
+    def find_left_right_parent(self,node_id,parents_id):
+        for ele in self.pn_obj.connections :
+            from_id = ele["from"]["nodeId"]
+            to_id = ele["to"]["nodeId"]
+            if from_id in parents_id:
+                if ele["from"]["portIndex"] == 0 and to_id == node_id:
+                    left_parent_id = from_id
+                    parents_id.remove(left_parent_id)
+                    print(parents_id)
+                    right_parent_id = parents_id[0]
+                    break
+                if ele["from"]["portIndex"] == 1 and to_id == node_id: 
+                    right_parent_id = from_id
+                    parents_id.remove(right_parent_id)
+                    left_parent_id = parents_id[0]
+                    break 
+        return self.dataframe_name[left_parent_id],self.dataframe_name[right_parent_id]
 
 
     def call_method(self, operation_to_do, node_detail):

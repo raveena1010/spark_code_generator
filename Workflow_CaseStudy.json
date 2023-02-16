@@ -1,28 +1,7 @@
 {
   "workflow": {
     "nodes": [{
-      "id": "3bf29761-a888-d891-0c4b-2235e33d0d67",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "typeList",
-            "values": ["numeric", "boolean"]
-          }, {
-            "type": "columnList",
-            "values": ["Ticker_symbol", "Security"]
-          }, {
-            "type": "indexRange",
-            "values": [0, 2]
-          }],
-          "excluding": false
-        }
-      }
-    }, {
-      "id": "304d632f-d088-d7fd-d2b9-8e33d817754a",
+      "id": "153c4458-d826-ffa5-e262-92bca0d82b2c",
       "operation": {
         "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
         "name": "Read DataFrame"
@@ -31,407 +10,122 @@
         "data source": "1ac8632c-c31c-7152-86f2-edfdfcd53d23"
       }
     }, {
-      "id": "195528c2-d920-6629-d0ee-a3cf37d58b8c",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "JobTitle not in ('CAPTAIN III (POLICE DEPARTMENT)')"
-      }
-    }, {
-      "id": "d0ab40f5-c299-8278-965f-497d1881acaf",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "Ticker_symbol between 'ABT' and 'APD'"
-      }
-    }, {
-      "id": "abd78a69-d414-cce6-b49c-60306f43c7f2",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "indexRange",
-            "values": [1, 4]
-          }],
-          "excluding": true
-        }
-      }
-    }, {
-      "id": "cc311b76-06e5-1756-2d6c-8f9a96ea307e",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": " TotalPay between 500000 and 800000"
-      }
-    }, {
-      "id": "01e3c382-8a0d-ef36-e63c-95c8372dd32f",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "columnList",
-            "values": ["Ticker_symbol", "Sector"]
-          }, {
-            "type": "indexRange",
-            "values": [1, 3]
-          }],
-          "excluding": false
-        }
-      }
-    }, {
-      "id": "ee8ead03-65cb-77fc-0bcf-583165dcb411",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "columnList",
-            "values": ["Status", "Notes"]
-          }],
-          "excluding": true
-        }
-      }
-    }, {
-      "id": "d2b6fdad-9ebb-7c5e-8727-a44a09608da1",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "Sector in ('Health Care','Information Technology')"
-      }
-    }, {
-      "id": "31cf3e4f-ede9-6b80-da83-2b2bf77a3467",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "Ticker_symbol not in ('ABT','ABBV','ADBE')"
-      }
-    }, {
-      "id": "edf69935-b6ba-0b15-f2b7-b4d6f54c2189",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "indexRange",
-            "values": [4, 4]
-          }],
-          "excluding": false
-        }
-      }
-    }, {
-      "id": "42136b44-ed5b-26cd-deae-b6eb3aeb9a31",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "Headquarter in ('North Chicago; Illinois')"
-      }
-    }, {
-      "id": "5225faf1-1957-6a11-f55a-9c2352413a79",
+      "id": "97954960-14b4-c65c-159d-223fae122174",
       "operation": {
         "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
         "name": "Read DataFrame"
       },
       "parameters": {
-        "data source": "9620eccd-feac-b7e2-08c7-b015d3422351"
+        "data source": "af4ce352-eee6-8384-1801-b894e5f3c152"
       }
     }, {
-      "id": "3266c5ea-b202-7b9d-b155-5ef217adf917",
+      "id": "f8cac903-d990-d435-b207-383994b6c02d",
+      "operation": {
+        "id": "06374446-3138-4cf7-9682-f884990f3a60",
+        "name": "Join"
+      },
+      "parameters": {
+        "join type": {
+          "Outer": {
+
+          }
+        },
+        "left prefix": "x",
+        "right prefix": "y",
+        "join columns": [{
+          "left column": {
+            "type": "column",
+            "value": "Ticker_symbol"
+          },
+          "right column": {
+            "type": "column",
+            "value": "symbol"
+          }
+        }, {
+          "left column": {
+            "type": "index",
+            "value": 0
+          },
+          "right column": {
+            "type": "index",
+            "value": 1
+          }
+        }]
+      }
+    }, {
+      "id": "7e6761ed-d97f-60c3-46cf-6bf3a4fe02ab",
       "operation": {
         "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
         "name": "Filter Columns"
       },
       "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "indexRange",
-            "values": [0, 2]
-          }],
-          "excluding": false
-        }
-      }
-    }, {
-      "id": "bb0bfd1f-554d-cd22-8d3e-076f81096e87",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "columnList",
-            "values": ["Sub_Industry", "Headquarter"]
-          }, {
-            "type": "typeList",
-            "values": ["string"]
-          }],
-          "excluding": false
-        }
+
       }
     }],
     "connections": [{
       "from": {
-        "nodeId": "5225faf1-1957-6a11-f55a-9c2352413a79",
+        "nodeId": "153c4458-d826-ffa5-e262-92bca0d82b2c",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "ee8ead03-65cb-77fc-0bcf-583165dcb411",
+        "nodeId": "f8cac903-d990-d435-b207-383994b6c02d",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "bb0bfd1f-554d-cd22-8d3e-076f81096e87",
+        "nodeId": "97954960-14b4-c65c-159d-223fae122174",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "edf69935-b6ba-0b15-f2b7-b4d6f54c2189",
-        "portIndex": 0
+        "nodeId": "f8cac903-d990-d435-b207-383994b6c02d",
+        "portIndex": 1
       }
     }, {
       "from": {
-        "nodeId": "abd78a69-d414-cce6-b49c-60306f43c7f2",
+        "nodeId": "f8cac903-d990-d435-b207-383994b6c02d",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "31cf3e4f-ede9-6b80-da83-2b2bf77a3467",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "edf69935-b6ba-0b15-f2b7-b4d6f54c2189",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "42136b44-ed5b-26cd-deae-b6eb3aeb9a31",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "d0ab40f5-c299-8278-965f-497d1881acaf",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "01e3c382-8a0d-ef36-e63c-95c8372dd32f",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "d2b6fdad-9ebb-7c5e-8727-a44a09608da1",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "abd78a69-d414-cce6-b49c-60306f43c7f2",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "304d632f-d088-d7fd-d2b9-8e33d817754a",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "d0ab40f5-c299-8278-965f-497d1881acaf",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "304d632f-d088-d7fd-d2b9-8e33d817754a",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "3bf29761-a888-d891-0c4b-2235e33d0d67",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "ee8ead03-65cb-77fc-0bcf-583165dcb411",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "195528c2-d920-6629-d0ee-a3cf37d58b8c",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "5225faf1-1957-6a11-f55a-9c2352413a79",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "cc311b76-06e5-1756-2d6c-8f9a96ea307e",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "304d632f-d088-d7fd-d2b9-8e33d817754a",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "d2b6fdad-9ebb-7c5e-8727-a44a09608da1",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "01e3c382-8a0d-ef36-e63c-95c8372dd32f",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "3266c5ea-b202-7b9d-b155-5ef217adf917",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "d2b6fdad-9ebb-7c5e-8727-a44a09608da1",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "bb0bfd1f-554d-cd22-8d3e-076f81096e87",
+        "nodeId": "7e6761ed-d97f-60c3-46cf-6bf3a4fe02ab",
         "portIndex": 0
       }
     }]
   },
   "thirdPartyData": {
     "gui": {
-      "name": "retail",
+      "name": "wflow",
       "description": "",
       "nodes": {
-        "edf69935-b6ba-0b15-f2b7-b4d6f54c2189": {
+        "153c4458-d826-ffa5-e262-92bca0d82b2c": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 6322,
-            "y": 8375
+            "x": 5250,
+            "y": 7763
           }
         },
-        "bb0bfd1f-554d-cd22-8d3e-076f81096e87": {
+        "97954960-14b4-c65c-159d-223fae122174": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 6322,
-            "y": 8254
+            "x": 5482,
+            "y": 7763
           }
         },
-        "3bf29761-a888-d891-0c4b-2235e33d0d67": {
+        "f8cac903-d990-d435-b207-383994b6c02d": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 6001,
-            "y": 8078
+            "x": 5363,
+            "y": 7871
           }
         },
-        "195528c2-d920-6629-d0ee-a3cf37d58b8c": {
+        "7e6761ed-d97f-60c3-46cf-6bf3a4fe02ab": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 5191,
-            "y": 8372
-          }
-        },
-        "d2b6fdad-9ebb-7c5e-8727-a44a09608da1": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 6291,
-            "y": 8077
-          }
-        },
-        "304d632f-d088-d7fd-d2b9-8e33d817754a": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 6357,
-            "y": 7928
-          }
-        },
-        "5225faf1-1957-6a11-f55a-9c2352413a79": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 5406,
-            "y": 8024
-          }
-        },
-        "d0ab40f5-c299-8278-965f-497d1881acaf": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 6532,
-            "y": 8040
-          }
-        },
-        "01e3c382-8a0d-ef36-e63c-95c8372dd32f": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 6633,
-            "y": 8261
-          }
-        },
-        "42136b44-ed5b-26cd-deae-b6eb3aeb9a31": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 6297,
-            "y": 8506
-          }
-        },
-        "abd78a69-d414-cce6-b49c-60306f43c7f2": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 6062,
-            "y": 8281
-          }
-        },
-        "3266c5ea-b202-7b9d-b155-5ef217adf917": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 6628,
-            "y": 8367
-          }
-        },
-        "31cf3e4f-ede9-6b80-da83-2b2bf77a3467": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 6056,
-            "y": 8427
-          }
-        },
-        "cc311b76-06e5-1756-2d6c-8f9a96ea307e": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 5486,
-            "y": 8217
-          }
-        },
-        "ee8ead03-65cb-77fc-0bcf-583165dcb411": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 5206,
-            "y": 8219
+            "x": 5376,
+            "y": 7975
           }
         }
       }
@@ -440,32 +134,6 @@
 
     },
     "datasources": [{
-      "accessLevel": "writeRead",
-      "params": {
-        "name": "Salaries",
-        "libraryFileParams": {
-          "libraryPath": "library://Salaries.csv",
-          "fileFormat": "csv",
-          "csvFileFormatParams": {
-            "includeHeader": true,
-            "convert01ToBoolean": false,
-            "separatorType": "comma",
-            "customSeparator": null
-          }
-        },
-        "downloadUri": null,
-        "googleSpreadsheetParams": null,
-        "jdbcParams": null,
-        "hdfsParams": null,
-        "externalFileParams": null,
-        "datasourceType": "libraryFile",
-        "visibility": "privateVisibility"
-      },
-      "creationDateTime": "2023-02-15T11:13:16.041Z",
-      "id": "9620eccd-feac-b7e2-08c7-b015d3422351",
-      "ownerName": "user",
-      "ownerId": "00000000-0000-0000-0000-000000000001"
-    }, {
       "accessLevel": "writeRead",
       "params": {
         "name": "Stockcompanies",
@@ -491,12 +159,38 @@
       "id": "1ac8632c-c31c-7152-86f2-edfdfcd53d23",
       "ownerName": "user",
       "ownerId": "00000000-0000-0000-0000-000000000001"
+    }, {
+      "accessLevel": "writeRead",
+      "params": {
+        "name": "stock_price_less_memoryused",
+        "libraryFileParams": {
+          "libraryPath": "library://stock_price_less_memoryused.csv",
+          "fileFormat": "csv",
+          "csvFileFormatParams": {
+            "includeHeader": true,
+            "convert01ToBoolean": false,
+            "separatorType": "comma",
+            "customSeparator": null
+          }
+        },
+        "downloadUri": null,
+        "googleSpreadsheetParams": null,
+        "jdbcParams": null,
+        "hdfsParams": null,
+        "externalFileParams": null,
+        "datasourceType": "libraryFile",
+        "visibility": "privateVisibility"
+      },
+      "creationDateTime": "2023-02-15T11:13:30.781Z",
+      "id": "af4ce352-eee6-8384-1801-b894e5f3c152",
+      "ownerName": "user",
+      "ownerId": "00000000-0000-0000-0000-000000000001"
     }]
   },
   "variables": {
 
   },
-  "id": "8aa45bf0-59fa-4c8c-975a-5b8f586a5ff0",
+  "id": "c26fa1ae-076b-4913-956e-6553a76e2568",
   "metadata": {
     "type": "batch",
     "apiVersion": "1.4.3"
