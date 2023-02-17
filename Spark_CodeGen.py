@@ -40,6 +40,14 @@ class Generate_SparkCode:
             delegate_operation.Node_Operation.get_case(del_obj, fun_to_call)
             self.visited[node_id] = True
 
+    def is_all_parent_visited(self,child):
+        all_parents = pn_obj.child_parent[child]
+        can_execute_child = True
+        for id in all_parents:
+            if self.visited[id] == False:
+                can_execute_child = False
+                break
+        return can_execute_child
 
     def BFS(self, node):
         queue = []
@@ -50,16 +58,19 @@ class Generate_SparkCode:
             print('order of execution', s)
             if s in pn_obj.relation_dict:
                 for child in pn_obj.relation_dict[s]:
-                    if not self.visited[child]:
-                        queue.append(child)
-                        node_details = self.dict_operation[child]
-                        operation_id = node_details['operation']['id']
-                        operation_to_do = operations_dict[operation_id]
-                        fun_to_call = [operation_to_do, node_details]
-                        delegate_operation.Node_Operation.get_case(del_obj, fun_to_call)
-                        self.visited[child] = True
+                    can_execute_child = self.is_all_parent_visited(child)
+                    if can_execute_child:
+                        if not self.visited[child]:
+                            queue.append(child)
+                            node_details = self.dict_operation[child]
+                            operation_id = node_details['operation']['id']
+                            operation_to_do = operations_dict[operation_id]
+                            fun_to_call = [operation_to_do, node_details]
+                            delegate_operation.Node_Operation.get_case(del_obj, fun_to_call)
+                            self.visited[child] = True
 
 
 job = Generate_SparkCode()
-print(job.del_obj.cached_df_schema)
+print(del_obj.cached_df_schema)
+print(del_obj.dataframe_name )
 

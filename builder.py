@@ -46,7 +46,6 @@ def update_schema_after_filtercol(self,schema,cols_to_add,df_name):
 
 def update_schema_after_join(self,schema1,schema2,left_cols,right_cols,cols_to_remove,df_name):
     new_schema = {}
-    print(right_cols,left_cols)
     x = 0
     y = 0
     for i in schema1:
