@@ -44,6 +44,7 @@ class Node_Operation:
                 data_from = datasource['params']['datasourceType'] + "Params"
                 file_format = datasource['params'][data_from]['fileFormat']
                 datasource_name = datasource['params']['name']
+                print(data_from)
                 if datasource_name not in self.dataframe_name:
                     if 'library' in data_from:
                         url = 'loc'
@@ -66,7 +67,7 @@ class Node_Operation:
                 df_name = cleanse_data(datasource_name)
                 url = input("Give file location of data_{0} ".format(self.read_count)).strip()
                 url = cleanse_data(url)
-                columns = self.get_schema_details_from_user()
+                columns = self.get_schema_details_from_user(datasource_name)
                 file_format = input("Give file_format of data_{0} ".format(self.read_count)).strip()
                 file_format = cleanse_data(file_format)
                 if file_format == 'csv':
@@ -100,11 +101,12 @@ class Node_Operation:
             data_from = datasource['params']['datasourceType'] + "Params"
             file_format = datasource['params'][data_from]['fileFormat']
             datasource_name = datasource['params']['name']
-            url = '"' + datasource['params'][data_from]['url'] + '"'
-            if 'library' in url:
-                url = input("Give file location of {0} data ".format(datasource_name)).strip()
-                url = cleanse_data(url)
-            code = f"{df_name}.write.{file_format}.path('{url}')"
+            #url = '"' + datasource['params'][data_from]['url'] + '"'
+            
+            #if 'library' in url:
+                #url = input("Give file location of {0} data ".format(datasource_name)).strip()
+                #url = cleanse_data(url)
+            #code = f"{df_name}.write.{file_format}.path('{url}')"
 
         else:
             url = input(f"Give file location to save {df_name}").strip()
@@ -119,8 +121,8 @@ class Node_Operation:
                 code = f"{df_name} = spark.read.option('header',{include_header}).option('delimiter','{separator_type}').option('inferschema',True).csv('{url}')"
             else:
                 code = f"{df_name} = spark.read.{file_format}('{url}')"
-        self.code_file.write(code + '\n')
-        add_child_in_output(self,node_id,df_name) #not needed
+        #self.code_file.write(code + '\n')
+        #add_child_in_output(self,node_id,df_name) #not needed
 
     def filter_rows(self, node):
         node_id = node['id']
@@ -137,7 +139,31 @@ class Node_Operation:
         self.cached_df_schema[df_name] = schema
         add_child_in_output(self,node_id,df_name)
 
+    def fetch_value(self,selections,is_exclude,schema):
+        index_range = []
+        filterby_range = False
+        req_col = []
+        for ele in selections:
+            selection_type = ele['type']
+            values = ele['values']
+            if selection_type == 'indexRange':
+                filterby_range = True
+                index_range.append(values)
+            if selection_type == 'typeList':
+                cols_to_add = self.filter_col_bytype(values,is_exclude,schema)
+                req_col.extend(cols_to_add)
+            if selection_type == 'columnList':
+                cols_to_add = self.filter_col_bylist(values, is_exclude, schema)
+                req_col.extend(cols_to_add)
 
+        if filterby_range:
+            cols_to_add = self.filter_col_byindex(index_range, is_exclude, schema)
+            req_col.extend(cols_to_add)
+
+        required_cols = []
+        [required_cols.append(x) for x in req_col if x not in required_cols]  
+        return required_cols  
+    
     def filter_columns(self, node):
         node_id = node['id']
         df_name = self.dataframe_name[node_id]
@@ -147,35 +173,13 @@ class Node_Operation:
         schema = self.cached_df_schema[parent_name]
         selections = node['parameters']["selected columns"]['selections']
         is_exclude = node['parameters']["selected columns"]['excluding']
-        filterby_range = False
-        index_range = []
-        required_cols = []
-        req_col = []
-        for ele in selections:
-            selection_type = ele['type']
-            values = ele['values']
-            if selection_type == 'indexRange':
-                filterby_range = True
-                index_range.append(values)
-            if selection_type == 'typeList':
-                cols_to_add = self.filter_col_bytype(df_name,values,is_exclude,schema)
-                req_col.extend(cols_to_add)
-            if selection_type == 'columnList':
-                cols_to_add = self.filter_col_bylist(df_name, values, is_exclude, schema)
-                req_col.extend(cols_to_add)
-
-        if filterby_range:
-            cols_to_add = self.filter_col_byindex(df_name, index_range, is_exclude, schema)
-            req_col.extend(cols_to_add)
-        
-
-        [required_cols.append(x) for x in req_col if x not in required_cols]
+        required_cols = self.fetch_value(selections,is_exclude,schema)
         code = "{0} = {1}.select({2})".format(df_name, df_name, required_cols)
         self.code_file.write(code + '\n')
         update_schema_after_filtercol(self,schema, required_cols, df_name)
         add_child_in_output(self,node_id,df_name)    
 
-    def filter_col_bylist(self,df_name, values, is_exclude, schema):
+    def filter_col_bylist(self, values, is_exclude, schema):
         cols = list(schema.keys())
         cols_to_add = []
         if is_exclude:
@@ -187,7 +191,7 @@ class Node_Operation:
         return cols_to_add
     
 
-    def filter_col_bytype(self,df_name,values,is_exclude,schema):
+    def filter_col_bytype(self,values,is_exclude,schema):
         datatype_match = compare_datatype(schema)
         cols_to_add = []
         if not is_exclude:
@@ -202,7 +206,7 @@ class Node_Operation:
                     cols_to_add.append(i)
         return cols_to_add
 
-    def filter_col_byindex(self,df_name,index_range,is_exclude,schema):
+    def filter_col_byindex(self,index_range,is_exclude,schema):
         cols = list(schema.keys())
         cols_to_add = []
         if not is_exclude:
@@ -243,8 +247,13 @@ class Node_Operation:
         set_df_name_for_child(self,node_id,df_name)
         left_cols = list(left_parent_schema.keys())
         right_cols = list(right_parent_schema.keys())
+        if left_parent_name == right_parent_name:
+            right_parent_name = right_parent_name + '_right'
+            code = f'{right_parent_name}={left_parent_name}'
+            self.code_file.write(code + '\n')
         left_parent_name_alias =left_parent_name
         right_parent_name_alias = right_parent_name
+        print(left_parent_name,right_parent_name,'lklk')
 
         if left_prefix :
             left_cols = [left_prefix+col for col in left_cols]
@@ -341,10 +350,46 @@ class Node_Operation:
         #get the parent of this and update that as schema as no change in cols
         self.cached_df_schema[df_name] = schema
         add_child_in_output(self,node_id,df_name)
+    
 
+    def sql_column_transformation(self,node):
+        node_id = node['id']
+        df_name = self.dataframe_name[node_id]
+        set_df_name_for_child(self,node_id,df_name)
+        formula = node['parameters'].get('formula')
+        parents_id = self.pn_obj.child_parent[node_id]
+        parent_name = self.dataframe_name[parents_id[0]]
+        schema = self.cached_df_schema[parent_name]
+        parent_columns = list(schema.keys())
+        input_col_alias = node['parameters'].get("input column alias",'')
+        transformation = ''
+        if formula:
+            operate_on = node['parameters']['operate on']
+            if 'one column' in operate_on:
+                if operate_on['one column']['input column']['type'] == 'column':
+                    col = operate_on['one column']['input column']['value']
+                    formula.replace(input_col_alias,col)
+                else:
+                    col = parent_columns[operate_on['one column']['input column']['value']]
+                    formula = formula.replace(input_col_alias,col)
+            if 'multiple columns' in operate_on:
+                selections = operate_on['multiple columns']['input columns']['selections']
+                is_exclude = operate_on['multiple columns']['input columns']['excluding']
+                required_cols = self.fetch_value(selections,is_exclude,schema)
+                
+                for i in required_cols:
+                    print(required_cols)
+                    formula1 = formula.replace(input_col_alias,i) 
+                    transformation = transformation + f'.withColumn("{i}",expr("{formula1}"))'
 
-
-
+            print('chcj',transformation)
+        code = f"{df_name} = {df_name}{transformation}"
+        print(code,'cod')
+        self.code_file.write(code + '\n')
+        #get the parent of this and update that as schema as no change in cols
+        self.cached_df_schema[df_name] = schema
+        add_child_in_output(self,node_id,df_name)
+      
 
     def call_method(self, operation_to_do, node_detail):
         method = operation_to_do

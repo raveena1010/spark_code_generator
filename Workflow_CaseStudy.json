@@ -1,68 +1,75 @@
 {
   "workflow": {
     "nodes": [{
-      "id": "8b23fddb-b9c0-ad3b-c6ef-c5aa25ee29c7",
+      "id": "ad0fa2be-ecf3-367b-ca4b-43094be464a8",
+      "operation": {
+        "id": "bf082da2-a0d9-4335-a62f-9804217a1436",
+        "name": "Write DataFrame"
+      },
+      "parameters": {
+        "data source": "de1c3271-85f1-07b5-1f6a-868d81607185"
+      }
+    }, {
+      "id": "cddad07e-cd1b-f903-c371-48eb4689e3d7",
+      "operation": {
+        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
+        "name": "Filter Columns"
+      },
+      "parameters": {
+        "selected columns": {
+          "selections": [{
+            "type": "indexRange",
+            "values": [0, 2]
+          }, {
+            "type": "indexRange",
+            "values": [12, 13]
+          }, {
+            "type": "indexRange",
+            "values": [4, 7]
+          }],
+          "excluding": false
+        }
+      }
+    }, {
+      "id": "f169c94d-8511-2eb3-e378-4478a1a53603",
       "operation": {
         "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
         "name": "Read DataFrame"
       },
       "parameters": {
-        "data source": "1ac8632c-c31c-7152-86f2-edfdfcd53d23"
+        "data source": "46ef2e08-5633-82c4-72d7-03153db17834"
       }
     }, {
-      "id": "f801d275-f570-35c1-da1a-b17df35f16b9",
+      "id": "0a8842ee-b0ab-d40b-12b8-c123cdded4d5",
       "operation": {
         "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
         "name": "Filter Rows"
       },
       "parameters": {
-        "condition": "\r\n\r\ndSector = 'Utilities'"
+        "condition": "month = \"April\" or month = \"June\""
       }
     }, {
-      "id": "eb5a77d3-6cf3-6470-ca81-be7dfa3c86a1",
-      "operation": {
-        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
-        "name": "Read DataFrame"
-      },
-      "parameters": {
-        "data source": "1ac8632c-c31c-7152-86f2-edfdfcd53d23"
-      }
-    }, {
-      "id": "de194548-8ac5-9c5b-7a42-b99aef268728",
+      "id": "5d5d859c-5bfc-b327-6f5b-54c1d13729c5",
       "operation": {
         "id": "06374446-3138-4cf7-9682-f884990f3a60",
         "name": "Join"
       },
       "parameters": {
-        "join type": {
-          "Outer": {
-
-          }
-        },
-        "left prefix": "c",
-        "right prefix": "d",
+        "left prefix": "Left_",
+        "right prefix": "Right_",
         "join columns": [{
           "left column": {
             "type": "column",
-            "value": "symbol"
+            "value": "location_category"
           },
           "right column": {
             "type": "column",
-            "value": "Ticker_symbol"
-          }
-        }, {
-          "left column": {
-            "type": "index",
-            "value": 1
-          },
-          "right column": {
-            "type": "index",
-            "value": 3
+            "value": "location_category"
           }
         }]
       }
     }, {
-      "id": "1df86413-eed7-1229-69f2-78745de98e52",
+      "id": "841c39e0-2118-14e2-1aac-6e4afe61f2d0",
       "operation": {
         "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
         "name": "Filter Columns"
@@ -71,217 +78,166 @@
         "selected columns": {
           "selections": [{
             "type": "columnList",
-            "values": ["open", "close", "date", "symbol"]
-          }],
-          "excluding": false
-        }
-      }
-    }, {
-      "id": "74307fe3-ec55-89b0-ffd5-0a02f17a05cb",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "open > 100 and close >100"
-      }
-    }, {
-      "id": "acdb9181-b00a-554c-9da1-a745b82947ef",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "indexRange",
-            "values": [1, 3]
+            "values": ["masked_user_id", "masked_advertising_id"]
           }, {
             "type": "indexRange",
-            "values": [0, 2]
+            "values": [0, 3]
           }],
-          "excluding": false
+          "excluding": true
         }
       }
     }, {
-      "id": "13e0abcc-250c-901e-084f-a4c753ba2eba",
+      "id": "5d817900-79fc-deee-270b-f8ced9856df2",
       "operation": {
-        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
-        "name": "Read DataFrame"
+        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
+        "name": "SQL Column Transformation"
       },
       "parameters": {
-        "data source": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833"
-      }
-    }, {
-      "id": "34b81ab1-3453-7f5e-c0b3-92722a798aff",
-      "operation": {
-        "id": "06374446-3138-4cf7-9682-f884990f3a60",
-        "name": "Join"
-      },
-      "parameters": {
-        "left prefix": "x",
-        "right prefix": "y",
-        "join columns": [{
-          "left column": {
-            "type": "index",
-            "value": 1
-          },
-          "right column": {
-            "type": "index",
-            "value": 0
+        "input column alias": "x",
+        "formula": "initcap(x)",
+        "operate on": {
+          "multiple columns": {
+            "input columns": {
+              "selections": [{
+                "type": "typeList",
+                "values": ["numeric"]
+              }, {
+                "type": "columnList",
+                "values": ["advertising_id", "city"]
+              }, {
+                "type": "indexRange",
+                "values": [1, 3]
+              }],
+              "excluding": false
+            }
           }
-        }]
+        }
       }
     }],
     "connections": [{
       "from": {
-        "nodeId": "74307fe3-ec55-89b0-ffd5-0a02f17a05cb",
+        "nodeId": "f169c94d-8511-2eb3-e378-4478a1a53603",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "de194548-8ac5-9c5b-7a42-b99aef268728",
+        "nodeId": "5d5d859c-5bfc-b327-6f5b-54c1d13729c5",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "acdb9181-b00a-554c-9da1-a745b82947ef",
+        "nodeId": "5d5d859c-5bfc-b327-6f5b-54c1d13729c5",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "de194548-8ac5-9c5b-7a42-b99aef268728",
+        "nodeId": "ad0fa2be-ecf3-367b-ca4b-43094be464a8",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "f169c94d-8511-2eb3-e378-4478a1a53603",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "cddad07e-cd1b-f903-c371-48eb4689e3d7",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "f169c94d-8511-2eb3-e378-4478a1a53603",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "5d5d859c-5bfc-b327-6f5b-54c1d13729c5",
         "portIndex": 1
       }
     }, {
       "from": {
-        "nodeId": "f801d275-f570-35c1-da1a-b17df35f16b9",
+        "nodeId": "f169c94d-8511-2eb3-e378-4478a1a53603",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "34b81ab1-3453-7f5e-c0b3-92722a798aff",
+        "nodeId": "0a8842ee-b0ab-d40b-12b8-c123cdded4d5",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "eb5a77d3-6cf3-6470-ca81-be7dfa3c86a1",
+        "nodeId": "0a8842ee-b0ab-d40b-12b8-c123cdded4d5",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "acdb9181-b00a-554c-9da1-a745b82947ef",
+        "nodeId": "841c39e0-2118-14e2-1aac-6e4afe61f2d0",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "de194548-8ac5-9c5b-7a42-b99aef268728",
+        "nodeId": "f169c94d-8511-2eb3-e378-4478a1a53603",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "f801d275-f570-35c1-da1a-b17df35f16b9",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "8b23fddb-b9c0-ad3b-c6ef-c5aa25ee29c7",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "34b81ab1-3453-7f5e-c0b3-92722a798aff",
-        "portIndex": 1
-      }
-    }, {
-      "from": {
-        "nodeId": "13e0abcc-250c-901e-084f-a4c753ba2eba",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "1df86413-eed7-1229-69f2-78745de98e52",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "1df86413-eed7-1229-69f2-78745de98e52",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "74307fe3-ec55-89b0-ffd5-0a02f17a05cb",
+        "nodeId": "5d817900-79fc-deee-270b-f8ced9856df2",
         "portIndex": 0
       }
     }]
   },
   "thirdPartyData": {
     "gui": {
-      "name": "join_cs",
+      "name": "act_cs",
       "description": "",
       "nodes": {
-        "f801d275-f570-35c1-da1a-b17df35f16b9": {
+        "f169c94d-8511-2eb3-e378-4478a1a53603": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7319,
-            "y": 8771
+            "x": 6022,
+            "y": 7736
           }
         },
-        "1df86413-eed7-1229-69f2-78745de98e52": {
+        "5d817900-79fc-deee-270b-f8ced9856df2": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7615,
-            "y": 8494
+            "x": 5976,
+            "y": 7971
           }
         },
-        "8b23fddb-b9c0-ad3b-c6ef-c5aa25ee29c7": {
+        "5d5d859c-5bfc-b327-6f5b-54c1d13729c5": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7600,
-            "y": 8682
+            "x": 6408,
+            "y": 7791
           }
         },
-        "34b81ab1-3453-7f5e-c0b3-92722a798aff": {
+        "ad0fa2be-ecf3-367b-ca4b-43094be464a8": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7546,
-            "y": 8815
+            "x": 6392,
+            "y": 8011
           }
         },
-        "eb5a77d3-6cf3-6470-ca81-be7dfa3c86a1": {
+        "cddad07e-cd1b-f903-c371-48eb4689e3d7": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7355,
-            "y": 8366
+            "x": 6197,
+            "y": 7872
           }
         },
-        "de194548-8ac5-9c5b-7a42-b99aef268728": {
+        "841c39e0-2118-14e2-1aac-6e4afe61f2d0": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7291,
-            "y": 8644
+            "x": 5746,
+            "y": 8014
           }
         },
-        "acdb9181-b00a-554c-9da1-a745b82947ef": {
+        "0a8842ee-b0ab-d40b-12b8-c123cdded4d5": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7311,
-            "y": 8498
-          }
-        },
-        "13e0abcc-250c-901e-084f-a4c753ba2eba": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7571,
-            "y": 8370
-          }
-        },
-        "74307fe3-ec55-89b0-ffd5-0a02f17a05cb": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7528,
-            "y": 8576
+            "x": 5735,
+            "y": 7876
           }
         }
       }
@@ -292,9 +248,9 @@
     "datasources": [{
       "accessLevel": "writeRead",
       "params": {
-        "name": "Stockcompanies",
+        "name": "output1",
         "libraryFileParams": {
-          "libraryPath": "library://Stockcompanies.csv",
+          "libraryPath": "library://output",
           "fileFormat": "csv",
           "csvFileFormatParams": {
             "includeHeader": true,
@@ -311,16 +267,21 @@
         "datasourceType": "libraryFile",
         "visibility": "privateVisibility"
       },
-      "creationDateTime": "2023-02-15T11:13:22.931Z",
-      "id": "1ac8632c-c31c-7152-86f2-edfdfcd53d23",
+      "creationDateTime": "2023-02-20T12:16:02.448Z",
+      "id": "de1c3271-85f1-07b5-1f6a-868d81607185",
       "ownerName": "user",
       "ownerId": "00000000-0000-0000-0000-000000000001"
     }, {
       "accessLevel": "writeRead",
       "params": {
-        "name": "StockPrice",
-        "libraryFileParams": {
-          "libraryPath": "library://StockPrice.csv",
+        "name": "act_data",
+        "libraryFileParams": null,
+        "downloadUri": null,
+        "googleSpreadsheetParams": null,
+        "jdbcParams": null,
+        "hdfsParams": null,
+        "externalFileParams": {
+          "url": "https://2weeks-landingbucket.s3.amazonaws.com/Actives_Staged_Result.csv",
           "fileFormat": "csv",
           "csvFileFormatParams": {
             "includeHeader": true,
@@ -329,16 +290,11 @@
             "customSeparator": null
           }
         },
-        "downloadUri": null,
-        "googleSpreadsheetParams": null,
-        "jdbcParams": null,
-        "hdfsParams": null,
-        "externalFileParams": null,
-        "datasourceType": "libraryFile",
+        "datasourceType": "externalFile",
         "visibility": "privateVisibility"
       },
-      "creationDateTime": "2023-02-20T07:15:12.215Z",
-      "id": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833",
+      "creationDateTime": "2023-02-15T11:12:53.038Z",
+      "id": "46ef2e08-5633-82c4-72d7-03153db17834",
       "ownerName": "user",
       "ownerId": "00000000-0000-0000-0000-000000000001"
     }]
@@ -346,7 +302,7 @@
   "variables": {
 
   },
-  "id": "724dac41-137d-432f-a6cf-45381581eebe",
+  "id": "f91bd7d8-8702-4a51-94f4-2735ed718b98",
   "metadata": {
     "type": "batch",
     "apiVersion": "1.4.3"

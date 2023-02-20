@@ -1,4 +1,14 @@
-Stockcompanies = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('loc')
-StockPrice = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('loc')
-Stockcompanies.sort(['Ticker_symbol'],ascending=[1])
-StockPrice.sort(['symbol', 'date'],ascending=[0, 1])
+act_data = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('"https://2weeks-landingbucket.s3.amazonaws.com/Actives_Staged_Result.csv"')
+act_data_b0= act_data
+act_data_b1= act_data
+act_data_b2= act_data
+act_data_b3= act_data
+act_data_b4= act_data
+act_data_right=act_data
+act_data_alias = act_data.toDF(*['Left_advertising_id', 'Left_city', 'Left_location_category', 'Left_location_granularities', 'Left_location_source', 'Left_state', 'Left_timestamp', 'Left_user_id', 'Left_user_latitude', 'Left_user_longitude', 'Left_month', 'Left_date', 'Left_masked_advertising_id', 'Left_masked_user_id'])
+act_data_right_alias = act_data_right.toDF(*['Right_advertising_id', 'Right_city', 'Right_location_category', 'Right_location_granularities', 'Right_location_source', 'Right_state', 'Right_timestamp', 'Right_user_id', 'Right_user_latitude', 'Right_user_longitude', 'Right_month', 'Right_date', 'Right_masked_advertising_id', 'Right_masked_user_id'])
+act_data_act_data_join = act_data_alias.join(act_data_right_alias,[act_data_alias.Left_location_category==act_data_right_alias.Right_location_category],'inner').drop('Right_location_category')
+act_data_b1 = act_data_b1.select(['advertising_id', 'state', 'user_id', 'masked_advertising_id', 'location_category', 'timestamp', 'masked_user_id', 'city', 'location_source'])
+act_data_b3 = act_data_b3.filter('month = "April" or month = "June"')
+act_data_b4 = act_data_b4.withColumn("timestamp",expr("initcap(timestamp)")).withColumn("user_latitude",expr("initcap(user_latitude)")).withColumn("user_longitude",expr("initcap(user_longitude)")).withColumn("advertising_id",expr("initcap(advertising_id)")).withColumn("city",expr("initcap(city)")).withColumn("location_granularities",expr("initcap(location_granularities)")).withColumn("location_category",expr("initcap(location_category)"))
+act_data_b3 = act_data_b3.select(['advertising_id', 'city', 'location_category', 'location_granularities', 'location_source', 'state', 'timestamp', 'user_id', 'user_latitude', 'user_longitude', 'month', 'date', 'masked_advertising_id', 'masked_user_id'])
