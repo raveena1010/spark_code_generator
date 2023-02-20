@@ -135,7 +135,7 @@ class Node_Operation:
         parent_name = self.dataframe_name[parents_id[0]]
         schema = self.cached_df_schema[parent_name]
         self.cached_df_schema[df_name] = schema
-        add_child_in_output(self,node_id,self.dataframe_name[node_id])
+        add_child_in_output(self,node_id,df_name)
 
 
     def filter_columns(self, node):
@@ -295,9 +295,7 @@ class Node_Operation:
 
         return condition,cols_to_remove,drop_cols
 
-
-
-        
+  
     def find_left_right_parent(self,node_id,parents_id):
         for ele in self.pn_obj.connections :
             from_id = ele["from"]["nodeId"]
@@ -314,6 +312,38 @@ class Node_Operation:
                     left_parent_id = parents_id[0]
                     break 
         return self.dataframe_name[left_parent_id],self.dataframe_name[right_parent_id]
+
+    
+    def sort(self,node):
+        node_id = node['id']
+        sort_columns = node['parameters']['sort columns']
+        df_name = self.dataframe_name[node_id]
+        set_df_name_for_child(self,node_id,df_name)
+        parents_id = self.pn_obj.child_parent[node_id]
+        parent_name = self.dataframe_name[parents_id[0]]
+        schema = self.cached_df_schema[parent_name]
+        parent_columns = list(schema.keys())
+        sort_col = []
+        order_type = []
+        for ele in sort_columns:
+            is_descending = ele.get("descending",False)
+            if is_descending:
+                order_type.append(0)
+            else:
+                order_type.append(1)   
+            if ele["column name"]["type"] == "column":
+                sort_col.append(ele["column name"]["value"])
+            else:
+                sort_col.append(parent_columns[ele["column name"]["value"]])
+
+        code = f"{df_name} = {df_name}.sort({sort_col},ascending={order_type})"
+        self.code_file.write(code + '\n')
+        #get the parent of this and update that as schema as no change in cols
+        self.cached_df_schema[df_name] = schema
+        add_child_in_output(self,node_id,df_name)
+
+
+
 
 
     def call_method(self, operation_to_do, node_detail):
