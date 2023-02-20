@@ -40,6 +40,7 @@ class Generate_SparkCode:
             delegate_operation.Node_Operation.get_case(del_obj, fun_to_call)
             self.visited[node_id] = True
 
+
     def is_all_parent_visited(self,child):
         all_parents = pn_obj.child_parent[child]
         can_execute_child = True
@@ -54,6 +55,7 @@ class Generate_SparkCode:
         queue.append(node)
         self.visited[node] = True
         while queue:
+            
             s = queue.pop(0)
             print('order of execution', s)
             if s in pn_obj.relation_dict:
@@ -71,6 +73,6 @@ class Generate_SparkCode:
 
 
 job = Generate_SparkCode()
-print(del_obj.cached_df_schema)
-print(del_obj.dataframe_name )
+print("Schema:",del_obj.cached_df_schema)
+print("Df name:",del_obj.dataframe_name )
 

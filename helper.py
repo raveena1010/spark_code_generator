@@ -23,3 +23,15 @@ def remove_space(list_data):
     for i in range(len(list_data)):
         list_data[i] = list_data[i].strip()
     return list_data
+
+def match_join_type(join_type):
+    if join_type == 'Join':
+        join_type = 'inner'
+    if join_type == "Outer":
+        join_type = 'outer'
+    if join_type =="Left outer":
+        join_type = 'left_outer'
+    if join_type == "Right outer":
+        join_type = 'right_outer'
+    return join_type    
+    

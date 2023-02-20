@@ -44,7 +44,7 @@ def update_schema_after_filtercol(self,schema,cols_to_add,df_name):
     self.cached_df_schema[df_name] = new_schema
 
 
-def update_schema_after_join(self,schema1,schema2,left_cols,right_cols,cols_to_remove,df_name):
+def update_schema_after_join(self,schema1,schema2,left_cols,right_cols,cols_to_remove,df_name,right_prefix):
     new_schema = {}
     x = 0
     y = 0
@@ -54,10 +54,11 @@ def update_schema_after_join(self,schema1,schema2,left_cols,right_cols,cols_to_r
          x = x +1
 
     for j in schema2:
-         if j not in cols_to_remove:
+         updated_col = right_prefix + j
+         if  updated_col not in cols_to_remove:
             col = right_cols[y]
             new_schema[col] =  schema2[j]
-         y = y+1 
+         y = y+1    
     self.cached_df_schema[df_name] = new_schema     
 
 

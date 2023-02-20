@@ -14,12 +14,12 @@ class Node_Operation:
         self.is_datasource_inhand = False
         self.datasource_dict = {}
         self.dataframe_name = {}
-        self.read_data_columns = {}
         self.cached_df_schema = {}
         self.operation_ids =[]
         generate_dataframe_name(self)
         generate_datasource_dict(self)
         self.read_count = 1
+        self.datasource_ids = {}
 
 
     def get_schema_details_from_user(self,datasource_name):
@@ -38,53 +38,57 @@ class Node_Operation:
     def read_dataframe(self, node):
         datasource_id = node['parameters']['data source']
         node_id = node['id']
+        if datasource_id  not in self.datasource_ids :
+            if self.is_datasource_inhand:
+                datasource = self.datasource_dict[datasource_id]
+                data_from = datasource['params']['datasourceType'] + "Params"
+                file_format = datasource['params'][data_from]['fileFormat']
+                datasource_name = datasource['params']['name']
+                if datasource_name not in self.dataframe_name:
+                    if 'library' in data_from:
+                        url = 'loc'
+                        #url = input("Give file location of {0} data ".format(datasource_name)).strip()
+                        #url = cleanse_data(url)
+                    else:
+                        url = '"' + datasource['params'][data_from]['url'] + '"'   
+                    columns = self.get_schema_details_from_user(datasource_name)
+                    if file_format == "csv":
+                        include_header = datasource['params'][data_from]['csvFileFormatParams']['includeHeader']
+                        separator_type = separator[datasource['params'][data_from]['csvFileFormatParams']['separatorType']]
+                        if not separator_type:
+                            separator_type = datasource['params'][data_from]['csvFileFormatParams']['customSeparator']
+                        code = f"{datasource_name} = spark.read.option('header',{include_header}).option('delimiter','{separator_type}').option('inferSchema',True).csv('{url}')"
+                    else:
+                        code = f"{datasource_name} = spark.read.{file_format}('{url}')"
 
-        if self.is_datasource_inhand:
-            datasource = self.datasource_dict[datasource_id]
-            data_from = datasource['params']['datasourceType'] + "Params"
-            file_format = datasource['params'][data_from]['fileFormat']
-            datasource_name = datasource['params']['name']
-            if datasource_name not in self.dataframe_name:
-                if 'library' in data_from:
-                    url = 'loc'
-                    #url = input("Give file location of {0} data ".format(datasource_name)).strip()
-                    #url = cleanse_data(url)
-                else:
-                    url = '"' + datasource['params'][data_from]['url'] + '"'   
-                columns = self.get_schema_details_from_user(datasource_name)
-                if file_format == "csv":
-                    include_header = datasource['params'][data_from]['csvFileFormatParams']['includeHeader']
-                    separator_type = separator[datasource['params'][data_from]['csvFileFormatParams']['separatorType']]
-                    if not separator_type:
-                        separator_type = datasource['params'][data_from]['csvFileFormatParams']['customSeparator']
+            else:
+                datasource_name = input("Give Name for data_{0} ".format(self.read_count)).strip()
+                df_name = cleanse_data(datasource_name)
+                url = input("Give file location of data_{0} ".format(self.read_count)).strip()
+                url = cleanse_data(url)
+                columns = self.get_schema_details_from_user()
+                file_format = input("Give file_format of data_{0} ".format(self.read_count)).strip()
+                file_format = cleanse_data(file_format)
+                if file_format == 'csv':
+                    include_header = input("Include header(True/False) for data_{0} ".format(self.read_count)).strip()
+                    separator_type = input("Separator type for data_{0} ".format(self.read_count)).strip()
+                    include_header = cleanse_data(include_header)
+                    separator_type = cleanse_data(separator_type)
                     code = f"{datasource_name} = spark.read.option('header',{include_header}).option('delimiter','{separator_type}').option('inferSchema',True).csv('{url}')"
                 else:
                     code = f"{datasource_name} = spark.read.{file_format}('{url}')"
+                self.read_count = self.read_count + 1
+
+            self.code_file.write(code + '\n')
+            self.datasource_ids[datasource_id] = datasource_name
 
         else:
-            datasource_name = input("Give Name for data_{0} ".format(self.read_count)).strip()
-            df_name = cleanse_data(datasource_name)
-            url = input("Give file location of data_{0} ".format(self.read_count)).strip()
-            url = cleanse_data(url)
-            columns = self.get_schema_details_from_user()
-            file_format = input("Give file_format of data_{0} ".format(self.read_count)).strip()
-            file_format = cleanse_data(file_format)
-            if file_format == 'csv':
-                include_header = input("Include header(True/False) for data_{0} ".format(self.read_count)).strip()
-                separator_type = input("Separator type for data_{0} ".format(self.read_count)).strip()
-                include_header = cleanse_data(include_header)
-                separator_type = cleanse_data(separator_type)
-                code = f"{datasource_name} = spark.read.option('header',{include_header}).option('delimiter','{separator_type}').option('inferSchema',True).csv('{url}')"
-            else:
-                code = f"{datasource_name} = spark.read.{file_format}('{url}')"
-            self.read_count = self.read_count + 1
+           datasource_name = self.datasource_ids[datasource_id]
 
-        self.read_data_columns[datasource_name] = columns
+        
         self.dataframe_name[node['id']] = datasource_name
-        self.code_file.write(code + '\n')
         set_df_name_for_child(self,node_id, datasource_name)
-        add_child_in_output(self,node_id,datasource_name)
-
+        add_child_in_output(self,node_id,datasource_name) 
 
     def write_dataframe(self, node):
         node_id = node['id']
@@ -146,6 +150,7 @@ class Node_Operation:
         filterby_range = False
         index_range = []
         required_cols = []
+        req_col = []
         for ele in selections:
             selection_type = ele['type']
             values = ele['values']
@@ -154,16 +159,17 @@ class Node_Operation:
                 index_range.append(values)
             if selection_type == 'typeList':
                 cols_to_add = self.filter_col_bytype(df_name,values,is_exclude,schema)
-                required_cols.extend(cols_to_add)
+                req_col.extend(cols_to_add)
             if selection_type == 'columnList':
                 cols_to_add = self.filter_col_bylist(df_name, values, is_exclude, schema)
-                required_cols.extend(cols_to_add)
+                req_col.extend(cols_to_add)
 
         if filterby_range:
             cols_to_add = self.filter_col_byindex(df_name, index_range, is_exclude, schema)
-            required_cols.extend(cols_to_add)
+            req_col.extend(cols_to_add)
         
-        required_cols = list(set(required_cols))
+
+        [required_cols.append(x) for x in req_col if x not in required_cols]
         code = "{0} = {1}.select({2})".format(df_name, df_name, required_cols)
         self.code_file.write(code + '\n')
         update_schema_after_filtercol(self,schema, required_cols, df_name)
@@ -171,13 +177,13 @@ class Node_Operation:
 
     def filter_col_bylist(self,df_name, values, is_exclude, schema):
         cols = list(schema.keys())
+        cols_to_add = []
         if is_exclude:
-            cols_to_add = []
             for i in cols:
                 if i not in values:
                     cols_to_add.append(i)
         else:
-            cols_to_add = values
+           cols_to_add = values
         return cols_to_add
     
 
@@ -220,11 +226,15 @@ class Node_Operation:
 
     def join(self,node):
         node_id = node['id']
-        join_type = str(node["parameters"].get("join type",'inner')).lower()
+        join_type = node["parameters"].get("join type")
+        if join_type:
+            join_type = list(join_type.keys())[0]
+        else:
+            join_type  = 'Join'
         left_prefix = node["parameters"].get("left prefix",'')
         right_prefix = node["parameters"].get("right prefix",'')
         join_columns =  node["parameters"].get("join columns")
-        parents_id = self.pn_obj.child_parent[node_id]
+        parents_id = self.pn_obj.child_parent[node_id] 
         left_parent_name , right_parent_name  =self.find_left_right_parent(node_id,parents_id)
         left_parent_schema = self.cached_df_schema[left_parent_name]
         right_parent_schema = self.cached_df_schema[right_parent_name]
@@ -232,9 +242,10 @@ class Node_Operation:
         self.dataframe_name[node_id] = df_name 
         set_df_name_for_child(self,node_id,df_name)
         left_cols = list(left_parent_schema.keys())
-        right_cols = list(right_parent_schema.keys()) 
+        right_cols = list(right_parent_schema.keys())
         left_parent_name_alias =left_parent_name
         right_parent_name_alias = right_parent_name
+
         if left_prefix :
             left_cols = [left_prefix+col for col in left_cols]
             left_parent_name_alias = left_parent_name+'_alias'
@@ -245,16 +256,17 @@ class Node_Operation:
             right_parent_name_alias = right_parent_name+'_alias'
             code = f"{right_parent_name_alias} = {right_parent_name}.toDF(*{right_cols})"
             self.code_file.write(code + '\n')
-        condition,cols_to_remove = self.get_join_condition(left_cols,right_cols,join_columns,left_parent_name_alias,right_parent_name_alias,left_prefix,right_prefix)    
-        code = f"{df_name} = {left_parent_name}.join({right_parent_name},[{condition}],'{join_type}')"
+        join_type = match_join_type(join_type)    
+        condition,cols_to_remove,drop_cols = self.get_join_condition(left_cols,right_cols,join_columns,left_parent_name_alias,right_parent_name_alias,left_prefix,right_prefix)    
+        code = f"{df_name} = {left_parent_name_alias}.join({right_parent_name_alias},[{condition}],'{join_type}'){drop_cols}"
         self.code_file.write(code + '\n')   
-        update_schema_after_join(self,left_parent_schema,right_parent_schema,left_cols,right_cols,cols_to_remove,df_name)
+        update_schema_after_join(self,left_parent_schema,right_parent_schema,left_cols,right_cols,cols_to_remove,df_name,right_prefix)
     
-
     def get_join_condition(self,leftcols,rightcols,join_columns,left_parent,right_parent,left_prefix,right_prefix):
         condition = ''
         cols_to_remove = []
         col = 0
+        drop_cols =''
         for con in join_columns:
             if con["left column"]['type'] == 'column':
                 left_col_for_join =  con["left column"]['value'] 
@@ -270,16 +282,18 @@ class Node_Operation:
             if con["right column"]['type'] == 'index':
                 right_col_for_join = rightcols[con["right column"]['value']] 
             
+            cols_to_remove.append(right_col_for_join)
+            if right_col_for_join not in drop_cols:
+                drop_cols = drop_cols +f".drop('{right_col_for_join}')"
             left_col_for_join = left_parent + '.' +left_col_for_join 
             right_col_for_join = right_parent + '.' + right_col_for_join
-            cols_to_remove.append(right_col_for_join)
             if col == len(join_columns)-1:
                 condition  = condition + f"{left_col_for_join}=={right_col_for_join}"
             else:
                 condition  = condition + f"{left_col_for_join}=={right_col_for_join}"  + ','    
             col = col+1    
 
-        return condition,cols_to_remove
+        return condition,cols_to_remove,drop_cols
 
 
 
@@ -289,12 +303,12 @@ class Node_Operation:
             from_id = ele["from"]["nodeId"]
             to_id = ele["to"]["nodeId"]
             if from_id in parents_id:
-                if ele["from"]["portIndex"] == 0 and to_id == node_id:
+                if ele["to"]["portIndex"] == 0 and to_id == node_id:
                     left_parent_id = from_id
                     parents_id.remove(left_parent_id)
                     right_parent_id = parents_id[0]
                     break
-                if ele["from"]["portIndex"] == 1 and to_id == node_id: 
+                if ele["to"]["portIndex"] == 1 and to_id == node_id: 
                     right_parent_id = from_id
                     parents_id.remove(right_parent_id)
                     left_parent_id = parents_id[0]
