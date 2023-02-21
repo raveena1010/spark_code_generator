@@ -1,0 +1,17 @@
+If the parent has more than 1 branch to reflect it  no_of_branch times dataframe will be created
+Example:
+parent: Stockcompanies
+children:
+Stockcompanies_b1= Stockcompanies
+Stockcompanies_b2= Stockcompanies
+
+If the same datasource is read again in code it will be reflected in this way
+Stockcompanies_r2 = Stockcompanies
+
+If union occurs then dataframe name will be left_parentname_right_parentname_union
+Example:
+Stockcompanies_Stockcompanies_r2_union = Stockcompanies.union(Stockcompanies_r2)
+
+If join occurs then dataframe name will be left_parentname_right_parentname_join
+Example:
+Stockcompanies_Stockcompanies_r2_join = Stockcompanies.join(Stockcompanies_r2,[ Stockcompanies.city == Stockcompanies_r2.city],'inner')

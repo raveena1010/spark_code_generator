@@ -37,7 +37,7 @@ class Generate_SparkCode:
             operation_id = node_details['operation']['id']
             operation_to_do = operations_dict[operation_id]
             fun_to_call = [operation_to_do, node_details, data]
-            delegate_operation.Node_Operation.get_case(del_obj, fun_to_call)
+            delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
             self.visited[node_id] = True
 
 
@@ -68,7 +68,7 @@ class Generate_SparkCode:
                             operation_id = node_details['operation']['id']
                             operation_to_do = operations_dict[operation_id]
                             fun_to_call = [operation_to_do, node_details]
-                            delegate_operation.Node_Operation.get_case(del_obj, fun_to_call)
+                            delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
                             self.visited[child] = True
 
 

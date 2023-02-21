@@ -1,4 +1,4 @@
-import json
+
 class Get_Root_Node:
 
     def __init__(self, data):
@@ -6,6 +6,7 @@ class Get_Root_Node:
         self.opId_of_read_data = "1a3b32f0-f56d-4c44-a396-29d2dfd43423"
         self.operations = data['workflow']['nodes']
         self.connections = data['workflow']['connections']
+        self.node_id_op_id = {}
         self.read_operations = self.get_all_read_operations()
         self.relation_dict = self.generate_parent_child()
         self.child_parent = self.generate_child_parent()
@@ -16,6 +17,7 @@ class Get_Root_Node:
         for node in self.operations:
             if node['operation']['id'] == self.opId_of_read_data:
                 read_operations_only.append(node['id'])
+            self.node_id_op_id[node['id']] = node['operation']['id']    
         return read_operations_only
 
     def generate_parent_child(self):
