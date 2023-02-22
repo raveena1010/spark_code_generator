@@ -2,8 +2,8 @@ If the parent has more than 1 branch to reflect it  no_of_branch times dataframe
 Example:
 parent: Stockcompanies
 children:
-Stockcompanies_b1= Stockcompanies
-Stockcompanies_b2= Stockcompanies
+Stockcompanies_b1
+Stockcompanies_b2
 
 If the same datasource is read again in code it will be reflected in this way
 Stockcompanies_r2 = Stockcompanies

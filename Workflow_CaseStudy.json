@@ -1,22 +1,50 @@
 {
   "workflow": {
     "nodes": [{
-      "id": "ea8483c7-8d68-05f7-6c72-93efde072a18",
+      "id": "0b57d12a-060b-67eb-1a10-f821fd697369",
       "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
+        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
+        "name": "Read DataFrame"
       },
       "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "columnList",
-            "values": ["rightSecurity", "rightSector"]
-          }],
-          "excluding": true
-        }
+        "data source": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833"
       }
     }, {
-      "id": "67ebd0ed-cd71-c873-f129-bafe4620defd",
+      "id": "fb8d836e-9d90-2766-d351-f73a42e3c5c0",
+      "operation": {
+        "id": "9c3225d8-d430-48c0-a46e-fa83909ad054",
+        "name": "Projection"
+      },
+      "parameters": {
+        "projection columns": [{
+          "original column": {
+            "type": "column",
+            "value": "date"
+          },
+          "rename column": {
+            "Yes": {
+              "column name": "dates"
+            }
+          }
+        }, {
+          "original column": {
+            "type": "index",
+            "value": 0
+          },
+          "rename column": {
+            "Yes": {
+              "column name": "ds"
+            }
+          }
+        }, {
+          "original column": {
+            "type": "column",
+            "value": "symbol"
+          }
+        }]
+      }
+    }, {
+      "id": "6f934fe7-51c4-5b9f-b131-34e7230118e8",
       "operation": {
         "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
         "name": "Filter Columns"
@@ -24,319 +52,60 @@
       "parameters": {
         "selected columns": {
           "selections": [{
-            "type": "columnList",
-            "values": ["Ticker_symbol", "Security", "Sector"]
+            "type": "typeList",
+            "values": ["string"]
           }],
           "excluding": false
         }
       }
-    }, {
-      "id": "d2fb41ea-807e-a67c-e22a-18f7b47e4226",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "Sector == 'Health Care'"
-      }
-    }, {
-      "id": "14c33d5e-8816-3254-396e-fd2ff948eed6",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "columnList",
-            "values": ["Sector"]
-          }],
-          "excluding": true
-        }
-      }
-    }, {
-      "id": "57ca69c6-b649-aad7-cfb1-8b8d20d5ef6d",
-      "operation": {
-        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
-        "name": "Read DataFrame"
-      },
-      "parameters": {
-        "data source": "1ac8632c-c31c-7152-86f2-edfdfcd53d23"
-      }
-    }, {
-      "id": "557e24f0-df0c-107a-7fbc-e2e546213397",
-      "operation": {
-        "id": "06374446-3138-4cf7-9682-f884990f3a60",
-        "name": "Join"
-      },
-      "parameters": {
-        "left prefix": "left",
-        "right prefix": "right",
-        "join columns": [{
-          "left column": {
-            "type": "column",
-            "value": "Ticker_symbol"
-          },
-          "right column": {
-            "type": "index",
-            "value": 0
-          }
-        }]
-      }
-    }, {
-      "id": "0356fe6d-af29-185b-d547-29b2d6ea4664",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "indexRange",
-            "values": [2, 4]
-          }],
-          "excluding": true
-        }
-      }
-    }, {
-      "id": "be493a47-035b-1bce-f248-3bbf2df0dd16",
-      "operation": {
-        "id": "1fa337cc-26f5-4cff-bd91-517777924d66",
-        "name": "Sort"
-      },
-      "parameters": {
-        "sort columns": [{
-          "column name": {
-            "type": "column",
-            "value": "Ticker_symbol"
-          }
-        }]
-      }
-    }, {
-      "id": "422d1e42-b2dc-08d4-8622-1403fdd3b93e",
-      "operation": {
-        "id": "90fed07b-d0a9-49fd-ae23-dd7000a1d8ad",
-        "name": "Union"
-      },
-      "parameters": {
-
-      }
-    }, {
-      "id": "57ec2110-eca7-a486-f068-2a78ebf225e5",
-      "operation": {
-        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
-        "name": "Read DataFrame"
-      },
-      "parameters": {
-        "data source": "1ac8632c-c31c-7152-86f2-edfdfcd53d23"
-      }
-    }, {
-      "id": "87043a5a-0e95-6085-e485-ebdf059a4146",
-      "operation": {
-        "id": "1fa337cc-26f5-4cff-bd91-517777924d66",
-        "name": "Sort"
-      },
-      "parameters": {
-        "sort columns": [{
-          "column name": {
-            "type": "column",
-            "value": "Ticker_symbol"
-          }
-        }]
-      }
     }],
     "connections": [{
       "from": {
-        "nodeId": "57ec2110-eca7-a486-f068-2a78ebf225e5",
+        "nodeId": "0b57d12a-060b-67eb-1a10-f821fd697369",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "422d1e42-b2dc-08d4-8622-1403fdd3b93e",
-        "portIndex": 1
-      }
-    }, {
-      "from": {
-        "nodeId": "422d1e42-b2dc-08d4-8622-1403fdd3b93e",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "d2fb41ea-807e-a67c-e22a-18f7b47e4226",
+        "nodeId": "fb8d836e-9d90-2766-d351-f73a42e3c5c0",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "422d1e42-b2dc-08d4-8622-1403fdd3b93e",
+        "nodeId": "fb8d836e-9d90-2766-d351-f73a42e3c5c0",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "be493a47-035b-1bce-f248-3bbf2df0dd16",
+        "nodeId": "6f934fe7-51c4-5b9f-b131-34e7230118e8",
         "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "d2fb41ea-807e-a67c-e22a-18f7b47e4226",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "67ebd0ed-cd71-c873-f129-bafe4620defd",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "57ca69c6-b649-aad7-cfb1-8b8d20d5ef6d",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "87043a5a-0e95-6085-e485-ebdf059a4146",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "67ebd0ed-cd71-c873-f129-bafe4620defd",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "14c33d5e-8816-3254-396e-fd2ff948eed6",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "557e24f0-df0c-107a-7fbc-e2e546213397",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "ea8483c7-8d68-05f7-6c72-93efde072a18",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "57ca69c6-b649-aad7-cfb1-8b8d20d5ef6d",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "422d1e42-b2dc-08d4-8622-1403fdd3b93e",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "0356fe6d-af29-185b-d547-29b2d6ea4664",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "557e24f0-df0c-107a-7fbc-e2e546213397",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "422d1e42-b2dc-08d4-8622-1403fdd3b93e",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "0356fe6d-af29-185b-d547-29b2d6ea4664",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "67ebd0ed-cd71-c873-f129-bafe4620defd",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "557e24f0-df0c-107a-7fbc-e2e546213397",
-        "portIndex": 1
       }
     }]
   },
   "thirdPartyData": {
     "gui": {
-      "name": "union",
+      "name": "projection",
       "description": "",
       "nodes": {
-        "57ca69c6-b649-aad7-cfb1-8b8d20d5ef6d": {
+        "0b57d12a-060b-67eb-1a10-f821fd697369": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7239,
-            "y": 8700
+            "x": 7439,
+            "y": 8756
           }
         },
-        "87043a5a-0e95-6085-e485-ebdf059a4146": {
+        "fb8d836e-9d90-2766-d351-f73a42e3c5c0": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 6990,
-            "y": 8796
+            "x": 7432,
+            "y": 8862
           }
         },
-        "557e24f0-df0c-107a-7fbc-e2e546213397": {
+        "6f934fe7-51c4-5b9f-b131-34e7230118e8": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7316,
-            "y": 9023
-          }
-        },
-        "ea8483c7-8d68-05f7-6c72-93efde072a18": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7328,
-            "y": 9118
-          }
-        },
-        "be493a47-035b-1bce-f248-3bbf2df0dd16": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7034,
-            "y": 8922
-          }
-        },
-        "57ec2110-eca7-a486-f068-2a78ebf225e5": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7574,
-            "y": 8714
-          }
-        },
-        "422d1e42-b2dc-08d4-8622-1403fdd3b93e": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7418,
-            "y": 8797
-          }
-        },
-        "d2fb41ea-807e-a67c-e22a-18f7b47e4226": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7540,
-            "y": 8890
-          }
-        },
-        "0356fe6d-af29-185b-d547-29b2d6ea4664": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7288,
-            "y": 8899
-          }
-        },
-        "67ebd0ed-cd71-c873-f129-bafe4620defd": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7539,
-            "y": 8975
-          }
-        },
-        "14c33d5e-8816-3254-396e-fd2ff948eed6": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7571,
-            "y": 9085
+            "x": 7429,
+            "y": 8971
           }
         }
       }
@@ -347,9 +116,9 @@
     "datasources": [{
       "accessLevel": "writeRead",
       "params": {
-        "name": "Stockcompanies",
+        "name": "StockPrice",
         "libraryFileParams": {
-          "libraryPath": "library://Stockcompanies.csv",
+          "libraryPath": "library://StockPrice.csv",
           "fileFormat": "csv",
           "csvFileFormatParams": {
             "includeHeader": true,
@@ -366,8 +135,8 @@
         "datasourceType": "libraryFile",
         "visibility": "privateVisibility"
       },
-      "creationDateTime": "2023-02-15T11:13:22.931Z",
-      "id": "1ac8632c-c31c-7152-86f2-edfdfcd53d23",
+      "creationDateTime": "2023-02-20T07:15:12.215Z",
+      "id": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833",
       "ownerName": "user",
       "ownerId": "00000000-0000-0000-0000-000000000001"
     }]
@@ -375,7 +144,7 @@
   "variables": {
 
   },
-  "id": "ad1156cf-38fa-4a32-b2c9-0ef3549061fd",
+  "id": "e38f212b-b024-4ea0-803a-4c820d83b9e1",
   "metadata": {
     "type": "batch",
     "apiVersion": "1.4.3"

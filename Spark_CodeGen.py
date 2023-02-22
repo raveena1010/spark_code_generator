@@ -14,11 +14,19 @@ del_obj = delegate_operation.Node_Operation(data, code_file, pn_obj)
 
 class Generate_SparkCode:
     def __init__(self):
+        self.instantiate_spark()
         self.generate_dict_operation()
         self.generate_isvisited_dict()
         self.execuete_read_operations()
         for i in pn_obj.parent_node:
             self.BFS(i)
+        
+    
+    def instantiate_spark(self):
+        code_file.write("from pyspark.sql import SparkSession"+'\n')
+        code_file.write('spark = SparkSession.builder.appName("SparkApp").master("local[5]").getOrCreate()'+'\n')
+        code_file.write("from pyspark.sql.functions import col"+'\n')
+        code_file.write("from pyspark.sql.functions import expr"+'\n')
 
     def generate_isvisited_dict(self):
         self.visited = {}

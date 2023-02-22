@@ -8,7 +8,8 @@ operations_dict = {
             "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a" :  "filter_rows",
             "06374446-3138-4cf7-9682-f884990f3a60" :  "join",
             "1fa337cc-26f5-4cff-bd91-517777924d66" :  "sort",
-            "90fed07b-d0a9-49fd-ae23-dd7000a1d8ad" :  "union"
+            "90fed07b-d0a9-49fd-ae23-dd7000a1d8ad" :  "union",
+            "9c3225d8-d430-48c0-a46e-fa83909ad054" :  "projection"
 
             }
 

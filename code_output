@@ -1,19 +1,7 @@
-Stockcompanies = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('loc')
-Stockcompanies_b1= Stockcompanies
-Stockcompanies_b2= Stockcompanies
-Stockcompanies_r2 = Stockcompanies
-Stockcompanies_b1 = Stockcompanies_b1.sort(['Ticker_symbol'],ascending=[1])
-Stockcompanies_Stockcompanies_r2_union = Stockcompanies.union(Stockcompanies_r2)
-Stockcompanies_Stockcompanies_r2_union_b1= Stockcompanies_Stockcompanies_r2_union
-Stockcompanies_Stockcompanies_r2_union_b2= Stockcompanies_Stockcompanies_r2_union
-Stockcompanies_Stockcompanies_r2_union_b3= Stockcompanies_Stockcompanies_r2_union
-Stockcompanies_Stockcompanies_r2_union_b1 = Stockcompanies_Stockcompanies_r2_union_b1.filter('Sector == "Health Care"')
-Stockcompanies_Stockcompanies_r2_union_b2 = Stockcompanies_Stockcompanies_r2_union_b2.sort(['Ticker_symbol'],ascending=[1])
-Stockcompanies_Stockcompanies_r2_union_b3 = Stockcompanies_Stockcompanies_r2_union_b3.select(['Ticker_symbol', 'Security'])
-Stockcompanies_Stockcompanies_r2_union_b1 = Stockcompanies_Stockcompanies_r2_union_b1.select(['Ticker_symbol', 'Security', 'Sector'])
-Stockcompanies_Stockcompanies_r2_union_b1_b1= Stockcompanies_Stockcompanies_r2_union_b1
-Stockcompanies_Stockcompanies_r2_union_b3_alias = Stockcompanies_Stockcompanies_r2_union_b3.toDF(*['leftTicker_symbol', 'leftSecurity'])
-Stockcompanies_Stockcompanies_r2_union_b1_alias = Stockcompanies_Stockcompanies_r2_union_b1.toDF(*['rightTicker_symbol', 'rightSecurity', 'rightSector'])
-Stockcompanies_Stockcompanies_r2_union_b3_Stockcompanies_Stockcompanies_r2_union_b1_join = Stockcompanies_Stockcompanies_r2_union_b3_alias.join(Stockcompanies_Stockcompanies_r2_union_b1_alias,[Stockcompanies_Stockcompanies_r2_union_b3_alias.leftTicker_symbol==Stockcompanies_Stockcompanies_r2_union_b1_alias.rightTicker_symbol],'inner').drop('rightTicker_symbol')
-Stockcompanies_Stockcompanies_r2_union_b1_b1 = Stockcompanies_Stockcompanies_r2_union_b1_b1.select(['Ticker_symbol', 'Security'])
-Stockcompanies_Stockcompanies_r2_union_b3_Stockcompanies_Stockcompanies_r2_union_b1_join = Stockcompanies_Stockcompanies_r2_union_b3_Stockcompanies_Stockcompanies_r2_union_b1_join.select(['leftTicker_symbol', 'leftSecurity'])
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("SparkApp").master("local[5]").getOrCreate()
+from pyspark.sql.functions import col
+from pyspark.sql.functions import expr
+StockPrice = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('loc')
+StockPrice = StockPrice.alias("df").select(col('date').alias('dates'),col('date').alias('ds'),'symbol',)
+StockPrice = StockPrice.select(['dates', 'ds', 'symbol'])

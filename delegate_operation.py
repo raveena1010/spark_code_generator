@@ -101,7 +101,7 @@ class Node_Operation:
 
         self.dataframe_name[node['id']] = datasource_name
         set_df_name_for_child(self,node_id, datasource_name)
-        add_child_in_output(self,node_id,datasource_name) 
+        #add_child_in_output(self,node_id,datasource_name) 
         
 
     def write_dataframe(self, node):
@@ -143,14 +143,14 @@ class Node_Operation:
         set_df_name_for_child(self,node_id,df_name)
         condition = node["parameters"]['condition']
         condition = condition.replace("'",'"')
-        code = f"{df_name} = {df_name}.filter('{condition}')"
-        self.code_file.write(code + '\n')
-        #get the parent of this and update that as schema as no change in cols
         parents_id = self.pn_obj.child_parent[node_id]
         parent_name = self.dataframe_name[parents_id[0]]
+        code = f"{df_name} = {parent_name}.filter('{condition}')"
+        self.code_file.write(code + '\n')
+        #get the parent of this and update that as schema as no change in cols
         schema = self.cached_df_schema[parent_name]
         self.cached_df_schema[df_name] = schema
-        add_child_in_output(self,node_id,df_name)
+        #add_child_in_output(self,node_id,df_name)
 
     def filter_columns(self, node):
         node_id = node['id']
@@ -162,10 +162,10 @@ class Node_Operation:
         selections = node['parameters']["selected columns"]['selections']
         is_exclude = node['parameters']["selected columns"]['excluding']
         required_cols = fetch_columns_to_add(self,selections,is_exclude,schema)
-        code = "{0} = {1}.select({2})".format(df_name, df_name, required_cols)
+        code = f"{df_name} = {parent_name}.select({required_cols})"
         self.code_file.write(code + '\n')
         update_schema_after_filtercol(self,schema, required_cols, df_name)
-        add_child_in_output(self,node_id,df_name)    
+        #add_child_in_output(self,node_id,df_name)    
 
     def filter_col_bylist(self, values, is_exclude, schema):
         cols = list(schema.keys())
@@ -226,7 +226,7 @@ class Node_Operation:
         set_df_name_for_child(self,node_id,df_name)
         schema = self.cached_df_schema[left_parent_name ]
         self.cached_df_schema[df_name] = schema
-        add_child_in_output(self,node_id,df_name)
+        #add_child_in_output(self,node_id,df_name)
 
     def join(self,node):
         node_id = node['id']
@@ -267,10 +267,10 @@ class Node_Operation:
             self.code_file.write(code + '\n')
         join_type = match_join_type(join_type)    
         condition,cols_to_remove,drop_cols = self.get_join_condition(left_cols,right_cols,join_columns,left_parent_name_alias,right_parent_name_alias,left_prefix,right_prefix)    
-        code = f"{df_name} = {left_parent_name_alias}.join({right_parent_name_alias},[{condition}],'{join_type}'){drop_cols}"
+        code = f"{df_name} = {left_parent_name_alias}.alias('left').join({right_parent_name_alias}.alias('right'),[{condition}],'{join_type}'){drop_cols}"
         self.code_file.write(code + '\n')   
         update_schema_after_join(self,left_parent_schema,right_parent_schema,left_cols,right_cols,cols_to_remove,df_name,right_prefix)
-    
+        
     def get_join_condition(self,leftcols,rightcols,join_columns,left_parent,right_parent,left_prefix,right_prefix):
         condition = ''
         cols_to_remove = []
@@ -327,11 +327,11 @@ class Node_Operation:
             else:
                 sort_col.append(parent_columns[ele["column name"]["value"]])
 
-        code = f"{df_name} = {df_name}.sort({sort_col},ascending={order_type})"
+        code = f"{df_name} = {parent_name}.sort({sort_col},ascending={order_type})"
         self.code_file.write(code + '\n')
         #get the parent of this and update that as schema as no change in cols
         self.cached_df_schema[df_name] = schema
-        add_child_in_output(self,node_id,df_name)
+        #add_child_in_output(self,node_id,df_name)
     
 
     def sql_column_transformation(self,node):
@@ -363,11 +363,11 @@ class Node_Operation:
                     formula1 = formula.replace(input_col_alias,i) 
                     transformation = transformation + f'.withColumn("{i}",expr("{formula1}"))'
 
-            code = f"{df_name} = {df_name}{transformation}"
+            code = f"{df_name} = {parent_name}{transformation}"
             self.code_file.write(code + '\n')
         #get the parent of this and update that as schema as no change in cols
         self.cached_df_schema[df_name] = schema
-        add_child_in_output(self,node_id,df_name)
+        #add_child_in_output(self,node_id,df_name)
       
     def sql_transformation(self,node):
         node_id = node['id']
@@ -379,8 +379,41 @@ class Node_Operation:
             self.code_file.write(register_table + '\n')
             code = f'{df_name} = spark.sql({expression})'
             self.code_file.write(code + '\n')
-            
-        
+
+    def projection(self,node):
+        project_schema = {}
+        node_id = node['id']
+        df_name = self.dataframe_name[node_id]
+        set_df_name_for_child(self,node_id,df_name)
+        projection_columns = node["parameters"]["projection columns"]
+        parents_id = self.pn_obj.child_parent[node_id]
+        parent_name = self.dataframe_name[parents_id[0]]
+        schema = self.cached_df_schema[parent_name]
+        parent_columns = list(schema.keys())
+        rename_condition = ''
+        for ele in projection_columns:
+            col = ''
+            if ele["original column"]["type"] == 'column':
+                col = ele["original column"]["value"]
+            else:
+                col =  parent_columns[ele["original column"]["value"]] 
+            col_datatype = schema[col]
+            is_rename_col = ele.get("rename column")
+            if is_rename_col:
+                rename_to = is_rename_col["Yes"]["column name"]
+                rename_condition =  rename_condition  + f"col('{col}').alias('{rename_to}')" + ','
+                project_schema[rename_to] = col_datatype
+
+            else:
+                rename_condition = rename_condition  +f"'{col}'" + ','
+                project_schema[col] = col_datatype
+
+        code = f'{df_name} = {parent_name}.alias("df").select({rename_condition})'
+        self.code_file.write(code + '\n')
+        self.cached_df_schema[df_name] = project_schema
+
+
+
     def call_respective_operation(self, operation_to_do, node_detail):
         method = operation_to_do
         return getattr(self, method)(node_detail)
