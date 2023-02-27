@@ -111,3 +111,9 @@ def find_left_right_parent(self,node_id,parents_id):
      
 
 
+def fetch_user_defined_missing_value(user_defined_missing_values):
+    values_to_consider = []
+    for ele in  user_defined_missing_values :
+        if len(ele) >0 :
+            values_to_consider.append(ele["missing value"])
+    return  values_to_consider  

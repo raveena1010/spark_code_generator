@@ -16,7 +16,7 @@ def compare_datatype(schema):
     return datatype_match
 
 def cleanse_data(str):
-    return re.sub(r'[\[\]\'\"\(\)\{\}]', '', str)
+    return re.sub(r'[\[\]\'"\(\)\{\}]', '', str)
 
 def remove_space(list_data):
     cleaned_data = []
@@ -35,3 +35,17 @@ def match_join_type(join_type):
         join_type = 'right_outer'
     return join_type    
     
+
+def return_valid_df_name(df_name):
+    return  re.sub("[^a-zA-Z0-9_]", "", df_name)   
+
+def return_valid_exp(exp):
+   return re.sub("[\n\r]", "", exp) 
+
+def check_column_is_valid(col):
+    if re.findall("[^a-zA-Z0-9_]",col):
+        col = "'"+col+"'"
+    return col    
+
+
+   

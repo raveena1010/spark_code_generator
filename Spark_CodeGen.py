@@ -27,6 +27,7 @@ class Generate_SparkCode:
         code_file.write('spark = SparkSession.builder.appName("SparkApp").master("local[5]").getOrCreate()'+'\n')
         code_file.write("from pyspark.sql.functions import col"+'\n')
         code_file.write("from pyspark.sql.functions import expr"+'\n')
+        code_file.write("from pyspark.sql.functions import when"+'\n')
 
     def generate_isvisited_dict(self):
         self.visited = {}
@@ -47,6 +48,7 @@ class Generate_SparkCode:
             fun_to_call = [operation_to_do, node_details, data]
             delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
             self.visited[node_id] = True
+            print("Schema:r read",del_obj.cached_df_schema)
 
 
     def is_all_parent_visited(self,child):
@@ -78,9 +80,10 @@ class Generate_SparkCode:
                             fun_to_call = [operation_to_do, node_details]
                             delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
                             self.visited[child] = True
+                            #print("Schema:",del_obj.cached_df_schema)
 
 
 job = Generate_SparkCode()
 print("Schema:",del_obj.cached_df_schema)
-print("Df name:",del_obj.dataframe_name )
+#print("Df name:",del_obj.dataframe_name )
 

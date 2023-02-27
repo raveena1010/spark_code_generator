@@ -9,7 +9,8 @@ operations_dict = {
             "06374446-3138-4cf7-9682-f884990f3a60" :  "join",
             "1fa337cc-26f5-4cff-bd91-517777924d66" :  "sort",
             "90fed07b-d0a9-49fd-ae23-dd7000a1d8ad" :  "union",
-            "9c3225d8-d430-48c0-a46e-fa83909ad054" :  "projection"
+            "9c3225d8-d430-48c0-a46e-fa83909ad054" :  "projection",
+            "d5f4e717-429f-4a28-a0d3-eebba036363a" :  "handle_missing_value"
 
             }
 

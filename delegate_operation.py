@@ -36,7 +36,6 @@ class Node_Operation:
         data_types = remove_space(data_types)
         schema = {columns[i]: data_types[i] for i in range(len(columns))}
         self.cached_df_schema[datasource_name] = schema
-        return columns
 
     def read_dataframe(self, node):
         datasource_id = node['parameters']['data source']
@@ -47,6 +46,7 @@ class Node_Operation:
                 data_from = datasource['params']['datasourceType'] + "Params"
                 file_format = datasource['params'][data_from]['fileFormat']
                 datasource_name = datasource['params']['name']
+                datasource_name = return_valid_df_name(datasource_name)
                 if datasource_name not in self.dataframe_name:
                     if 'library' in data_from:
                         url = 'loc'
@@ -54,7 +54,7 @@ class Node_Operation:
                         #url = cleanse_data(url)
                     else:
                         url = '"' + datasource['params'][data_from]['url'] + '"'   
-                    columns = self.get_schema_details_from_user(datasource_name)
+                    self.get_schema_details_from_user(datasource_name)
                     if file_format == "csv":
                         include_header = datasource['params'][data_from]['csvFileFormatParams']['includeHeader']
                         separator_type = separator[datasource['params'][data_from]['csvFileFormatParams']['separatorType']]
@@ -66,10 +66,11 @@ class Node_Operation:
 
             else:
                 datasource_name = input("Give Name for data_{0} ".format(self.read_count)).strip()
-                df_name = cleanse_data(datasource_name)
+                datasource_name = cleanse_data(datasource_name)
+                datasource_name = return_valid_df_name(datasource_name)
                 url = input("Give file location of data_{0} ".format(self.read_count)).strip()
                 url = cleanse_data(url)
-                columns = self.get_schema_details_from_user(datasource_name)
+                self.get_schema_details_from_user(datasource_name)
                 file_format = input("Give file_format of data_{0} ".format(self.read_count)).strip()
                 file_format = cleanse_data(file_format)
                 if file_format == 'csv':
@@ -142,6 +143,7 @@ class Node_Operation:
         df_name = self.dataframe_name[node_id]
         set_df_name_for_child(self,node_id,df_name)
         condition = node["parameters"]['condition']
+        condition = return_valid_exp(condition)
         condition = condition.replace("'",'"')
         parents_id = self.pn_obj.child_parent[node_id]
         parent_name = self.dataframe_name[parents_id[0]]
@@ -225,6 +227,7 @@ class Node_Operation:
         self.code_file.write(code + '\n')
         set_df_name_for_child(self,node_id,df_name)
         schema = self.cached_df_schema[left_parent_name ]
+        self.dataframe_name[node_id] = df_name
         self.cached_df_schema[df_name] = schema
         #add_child_in_output(self,node_id,df_name)
 
@@ -293,9 +296,9 @@ class Node_Operation:
             
             cols_to_remove.append(right_col_for_join)
             if right_col_for_join not in drop_cols:
-                drop_cols = drop_cols +f".drop('{right_col_for_join}')"
-            left_col_for_join = left_parent + '.' +left_col_for_join 
-            right_col_for_join = right_parent + '.' + right_col_for_join
+                drop_cols = drop_cols +f".drop('right.{right_col_for_join}')"
+            left_col_for_join = f"col('left.{left_col_for_join}')"
+            right_col_for_join = f"col('right.{right_col_for_join}')"
             if col == len(join_columns)-1:
                 condition  = condition + f"{left_col_for_join}=={right_col_for_join}"
             else:
@@ -343,16 +346,18 @@ class Node_Operation:
         parent_name = self.dataframe_name[parents_id[0]]
         schema = self.cached_df_schema[parent_name]
         parent_columns = list(schema.keys())
-        input_col_alias = node['parameters'].get("input column alias",'')
+        input_col_alias = node['parameters'].get("input column alias",'x')
         transformation = ''
         if formula:
             operate_on = node['parameters']['operate on']
             if 'one column' in operate_on:
                 if operate_on['one column']['input column']['type'] == 'column':
                     col = operate_on['one column']['input column']['value']
+                    col = check_column_is_valid(col)
                     formula.replace(input_col_alias,col)
                 else:
                     col = parent_columns[operate_on['one column']['input column']['value']]
+                    col = check_column_is_valid(col)
                     formula = formula.replace(input_col_alias,col)
             if 'multiple columns' in operate_on:
                 selections = operate_on['multiple columns']['input columns']['selections']
@@ -360,11 +365,15 @@ class Node_Operation:
                 required_cols = fetch_columns_to_add(self,selections,is_exclude,schema)
                 
                 for i in required_cols:
-                    formula1 = formula.replace(input_col_alias,i) 
+                    col = check_column_is_valid(i)
+                    formula1 = formula.replace(input_col_alias,col) 
                     transformation = transformation + f'.withColumn("{i}",expr("{formula1}"))'
 
             code = f"{df_name} = {parent_name}{transformation}"
             self.code_file.write(code + '\n')
+        else:
+            code = f"{df_name} = {parent_name}"
+            self.code_file.write(code + '\n')   
         #get the parent of this and update that as schema as no change in cols
         self.cached_df_schema[df_name] = schema
         #add_child_in_output(self,node_id,df_name)
@@ -411,8 +420,112 @@ class Node_Operation:
         code = f'{df_name} = {parent_name}.alias("df").select({rename_condition})'
         self.code_file.write(code + '\n')
         self.cached_df_schema[df_name] = project_schema
+        
 
+    def handle_missing_value(self,node):
+        node_id = node['id']
+        df_name = self.dataframe_name[node_id]
+        set_df_name_for_child(self,node_id,df_name)
+        columns = node["parameters"]["columns"]
+        strategy = node["parameters"].get("strategy","remove row")
+        missing_value_indicator = node["parameters"].get("missing value indicator")
+        user_defined_missing_values = node["parameters"]["user-defined missing values"]
+        parents_id = self.pn_obj.child_parent[node_id]
+        parent_name = self.dataframe_name[parents_id[0]]
+        schema = self.cached_df_schema[parent_name]
+        is_exclude = columns['excluding']
+        selections = columns['selections']
+        required_cols = fetch_columns_to_add(self,selections,is_exclude,schema)
+        values_to_consider = fetch_user_defined_missing_value(user_defined_missing_values)
+        self.findType(required_cols,schema)
+        code = f"{df_name} = {parent_name}"
+        code = self.add_missing_value_indicator(code,missing_value_indicator,values_to_consider,required_cols)
+        code = self.apply_stratergy(code,strategy,values_to_consider,required_cols)
+        #if missing value indicator added reflected in schema
+        new_schema = {}
+        for key in schema.keys():
+            new_schema[key]= schema[key]
+        for key  in self.schema_update.keys():
+            new_schema[key]= self.schema_update[key]
+        self.code_file.write(code + '\n')
+        self.cached_df_schema[df_name] = new_schema
+        print(schema)
+        
+    
 
+    def findType(self,required_cols,schema):
+        schema_of_req_col = {}
+        for i in required_cols:
+            schema_of_req_col[i] = schema[i]
+        datatype_match = compare_datatype(schema_of_req_col)
+        self.numeric_type = datatype_match['numeric']
+        self.string_type  = datatype_match['string']
+        self.bool_type =  datatype_match['boolean']
+     
+        
+    def apply_stratergy(self,code,strategy,values_to_consider,required_cols): 
+
+        if "replace with custom value" in strategy:
+            code = self.replace_with_custom_value(code,strategy,values_to_consider,required_cols)
+        if "remove row" in strategy: 
+            code = self.remove_row(code,strategy,values_to_consider,required_cols)   
+        
+        return code     
+
+    def replace_with_custom_value(self,code,strategy,values_to_consider,required_cols):
+        new_value = strategy["replace with custom value"]["value"]
+        if len(self.numeric_type) > 0 :
+            code = code + f".fillna({new_value},{required_cols})"
+            if len(self.string_type) > 0:
+                new_value = "'"+new_value+"'"
+                code = code + f".fillna({new_value},{required_cols})"
+        #User_defined_missing_value
+        if len(values_to_consider) > 0:
+            # Column has datatype that will be numeric only as replace there 
+            
+            if len(self.numeric_type) > 0 :
+                val = []
+                for i in values_to_consider:
+                    try:
+                        val.append(int(i))
+                    except:
+                        pass
+                values_to_consider = val        
+            else:
+                new_value = "'"+new_value+"'"
+            code = code +f".na.replace({values_to_consider},{new_value},{required_cols})"    
+        else:
+            if len(self.string_type) > 0 :
+                 new_value = "'"+new_value+"'"
+            code = code + f".fillna({new_value},{required_cols})"
+        return code
+         
+    def remove_row(self,code,strategy,values_to_consider,required_cols):
+            #User_defined_missing_value
+        code = code+ f".dropna('any',subset={required_cols})"
+        if len(values_to_consider) > 0:
+            for i in required_cols:    
+                code = code+ f".filter(~col('{i}').isin({values_to_consider}))"
+        return code
+
+    def add_missing_value_indicator(self,code,missing_value_indicator,values_to_consider,required_cols):
+        self.schema_update = {}
+        if missing_value_indicator and "Yes"  in missing_value_indicator:
+            prefix = missing_value_indicator['Yes']["indicator column prefix"]
+            for i in required_cols:
+                new_col_name = prefix+i
+                self.schema_update[new_col_name] = 'boolean'
+                condition = ''
+                if len(values_to_consider) >0:
+                    condition = f"when(col('{i}').isin({values_to_consider}),True)"
+                    condition = condition + f'.when(col("{i}").isNull(),True).otherwise(False)'    
+                    code = code + f".withColumn('{new_col_name}',{condition})" 
+                else:
+                    condition = condition + f'when(col("{i}").isNull(),True).otherwise(False)'    
+                    code = code + f".withColumn('{new_col_name}',{condition})"
+
+        return code    
+        
 
     def call_respective_operation(self, operation_to_do, node_detail):
         method = operation_to_do

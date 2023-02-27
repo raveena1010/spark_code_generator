@@ -1,111 +1,186 @@
 {
   "workflow": {
     "nodes": [{
-      "id": "0b57d12a-060b-67eb-1a10-f821fd697369",
+      "id": "3e5bb613-4c49-4950-67c1-cd7b236960da",
+      "operation": {
+        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
+        "name": "SQL Column Transformation"
+      },
+      "parameters": {
+        "input column alias": "x",
+        "formula": "cast(x as int)",
+        "operate on": {
+          "multiple columns": {
+            "input columns": {
+              "selections": [{
+                "type": "columnList",
+                "values": ["FUELTYPE", "MAKE"]
+              }, {
+                "type": "indexRange",
+                "values": [2, 6]
+              }],
+              "excluding": true
+            }
+          }
+        }
+      }
+    }, {
+      "id": "b46c9380-17b7-97aa-5e22-79f914e49124",
+      "operation": {
+        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
+        "name": "SQL Column Transformation"
+      },
+      "parameters": {
+        "operate on": {
+          "one column": {
+            "input column": {
+              "type": "column",
+              "value": "MAKE"
+            }
+          }
+        }
+      }
+    }, {
+      "id": "0a8cd179-6008-46c9-104d-7fad3d89708a",
+      "operation": {
+        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
+        "name": "SQL Column Transformation"
+      },
+      "parameters": {
+        "input column alias": "x",
+        "formula": "initcap(x)",
+        "operate on": {
+          "multiple columns": {
+            "input columns": {
+              "selections": [{
+                "type": "typeList",
+                "values": ["string"]
+              }, {
+                "type": "columnList",
+                "values": ["FUELTYPE", "MAKE"]
+              }, {
+                "type": "indexRange",
+                "values": [2, 6]
+              }],
+              "excluding": false
+            }
+          }
+        }
+      }
+    }, {
+      "id": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
       "operation": {
         "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
         "name": "Read DataFrame"
       },
       "parameters": {
-        "data source": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833"
+        "data source": "a2572977-729e-87ff-3c96-5f795b5d6635"
       }
     }, {
-      "id": "fb8d836e-9d90-2766-d351-f73a42e3c5c0",
+      "id": "43448dab-d27c-9b82-b9f1-687116110c70",
       "operation": {
-        "id": "9c3225d8-d430-48c0-a46e-fa83909ad054",
-        "name": "Projection"
+        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
+        "name": "SQL Column Transformation"
       },
       "parameters": {
-        "projection columns": [{
-          "original column": {
-            "type": "column",
-            "value": "date"
-          },
-          "rename column": {
-            "Yes": {
-              "column name": "dates"
+        "formula": "initcap(x)",
+        "operate on": {
+          "multiple columns": {
+            "input columns": {
+              "selections": [{
+                "type": "typeList",
+                "values": ["numeric"]
+              }, {
+                "type": "indexRange",
+                "values": [2, 6]
+              }],
+              "excluding": false
             }
           }
-        }, {
-          "original column": {
-            "type": "index",
-            "value": 0
-          },
-          "rename column": {
-            "Yes": {
-              "column name": "ds"
-            }
-          }
-        }, {
-          "original column": {
-            "type": "column",
-            "value": "symbol"
-          }
-        }]
-      }
-    }, {
-      "id": "6f934fe7-51c4-5b9f-b131-34e7230118e8",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "typeList",
-            "values": ["string"]
-          }],
-          "excluding": false
         }
       }
     }],
     "connections": [{
       "from": {
-        "nodeId": "0b57d12a-060b-67eb-1a10-f821fd697369",
+        "nodeId": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "fb8d836e-9d90-2766-d351-f73a42e3c5c0",
+        "nodeId": "3e5bb613-4c49-4950-67c1-cd7b236960da",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "fb8d836e-9d90-2766-d351-f73a42e3c5c0",
+        "nodeId": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "6f934fe7-51c4-5b9f-b131-34e7230118e8",
+        "nodeId": "0a8cd179-6008-46c9-104d-7fad3d89708a",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "43448dab-d27c-9b82-b9f1-687116110c70",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "b46c9380-17b7-97aa-5e22-79f914e49124",
         "portIndex": 0
       }
     }]
   },
   "thirdPartyData": {
     "gui": {
-      "name": "projection",
+      "name": "sql_col",
       "description": "",
       "nodes": {
-        "0b57d12a-060b-67eb-1a10-f821fd697369": {
+        "a69bf981-e6c5-6d63-afdc-a272c6ddf670": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7439,
-            "y": 8756
+            "x": 7636,
+            "y": 8634
           }
         },
-        "fb8d836e-9d90-2766-d351-f73a42e3c5c0": {
+        "43448dab-d27c-9b82-b9f1-687116110c70": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7432,
-            "y": 8862
+            "x": 6978,
+            "y": 8727
           }
         },
-        "6f934fe7-51c4-5b9f-b131-34e7230118e8": {
+        "b46c9380-17b7-97aa-5e22-79f914e49124": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7429,
-            "y": 8971
+            "x": 6990,
+            "y": 8623
+          }
+        },
+        "0a8cd179-6008-46c9-104d-7fad3d89708a": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 7233,
+            "y": 8727
+          }
+        },
+        "3e5bb613-4c49-4950-67c1-cd7b236960da": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 7488,
+            "y": 8727
           }
         }
       }
@@ -116,9 +191,9 @@
     "datasources": [{
       "accessLevel": "writeRead",
       "params": {
-        "name": "StockPrice",
+        "name": "auto-data_1",
         "libraryFileParams": {
-          "libraryPath": "library://StockPrice.csv",
+          "libraryPath": "library://auto-data_1.csv",
           "fileFormat": "csv",
           "csvFileFormatParams": {
             "includeHeader": true,
@@ -135,8 +210,8 @@
         "datasourceType": "libraryFile",
         "visibility": "privateVisibility"
       },
-      "creationDateTime": "2023-02-20T07:15:12.215Z",
-      "id": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833",
+      "creationDateTime": "2023-02-22T14:06:48.765Z",
+      "id": "a2572977-729e-87ff-3c96-5f795b5d6635",
       "ownerName": "user",
       "ownerId": "00000000-0000-0000-0000-000000000001"
     }]
@@ -144,7 +219,7 @@
   "variables": {
 
   },
-  "id": "e38f212b-b024-4ea0-803a-4c820d83b9e1",
+  "id": "5ec0ac53-c10b-41ba-878c-b890a349467f",
   "metadata": {
     "type": "batch",
     "apiVersion": "1.4.3"
