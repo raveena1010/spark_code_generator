@@ -3,8 +3,12 @@ spark = SparkSession.builder.appName("SparkApp").master("local[5]").getOrCreate(
 from pyspark.sql.functions import col
 from pyspark.sql.functions import expr
 from pyspark.sql.functions import when
-autodata_1 = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('loc')
-autodata_1_b1 = autodata_1.withColumn("ASPIRE",expr("cast(ASPIRE as int)")).withColumn("DOORS",expr("cast(DOORS as int)")).withColumn("BODY",expr("cast(BODY as int)")).withColumn("DRIVE",expr("cast(DRIVE as int)")).withColumn("CYLINDERS",expr("cast(CYLINDERS as int)")).withColumn("HP",expr("cast(HP as int)")).withColumn("RPM",expr("cast(RPM as int)")).withColumn("MPG-CITY",expr("cast('MPG-CITY' as int)")).withColumn("MPG-HWY",expr("cast('MPG-HWY' as int)")).withColumn("PRICE",expr("cast(PRICE as int)"))
-autodata_1_b2 = autodata_1.withColumn("MAKE",expr("initcap(MAKE)")).withColumn("FUELTYPE",expr("initcap(FUELTYPE)")).withColumn("ASPIRE",expr("initcap(ASPIRE)")).withColumn("DOORS",expr("initcap(DOORS)")).withColumn("BODY",expr("initcap(BODY)")).withColumn("DRIVE",expr("initcap(DRIVE)")).withColumn("CYLINDERS",expr("initcap(CYLINDERS)"))
-autodata_1_b3 = autodata_1.withColumn("HP",expr("initcap(HP)")).withColumn("RPM",expr("initcap(RPM)")).withColumn("MPG-CITY",expr("initcap('MPG-CITY')")).withColumn("MPG-HWY",expr("initcap('MPG-HWY')")).withColumn("PRICE",expr("initcap(PRICE)"))
-autodata_1_b4 = autodata_1
+act_data = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('"https://2weeks-landingbucket.s3.amazonaws.com/Actives_Staged_Result.csv"')
+act_data.registerTempTable("act")
+act_data_b1 = spark.sql("SELECT Advertising_id FROM act WHERE advertising_id LIKE 'M%'")
+act_data.registerTempTable("df")
+act_data_b2 = spark.sql("SELECT * FROM df")
+act_data_b1 = act_data_b1.select(['advertising_id'])
+act_data_b2.registerTempTable("df")
+act_data_b2 = spark.sql("select * , sha2('Advertising_id',256) , sha2('user_id',256) as uid from df")
+act_data_b2 = act_data_b2.select(['uid'])

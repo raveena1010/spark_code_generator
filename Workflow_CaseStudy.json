@@ -1,186 +1,171 @@
 {
   "workflow": {
     "nodes": [{
-      "id": "3e5bb613-4c49-4950-67c1-cd7b236960da",
+      "id": "03f58e08-920e-3914-c8f1-f2f711bd6185",
       "operation": {
-        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
-        "name": "SQL Column Transformation"
+        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
+        "name": "Filter Columns"
       },
       "parameters": {
-        "input column alias": "x",
-        "formula": "cast(x as int)",
-        "operate on": {
-          "multiple columns": {
-            "input columns": {
-              "selections": [{
-                "type": "columnList",
-                "values": ["FUELTYPE", "MAKE"]
-              }, {
-                "type": "indexRange",
-                "values": [2, 6]
-              }],
-              "excluding": true
-            }
-          }
+        "selected columns": {
+          "selections": [{
+            "type": "columnList",
+            "values": ["advertising_id"]
+          }],
+          "excluding": false
         }
       }
     }, {
-      "id": "b46c9380-17b7-97aa-5e22-79f914e49124",
-      "operation": {
-        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
-        "name": "SQL Column Transformation"
-      },
-      "parameters": {
-        "operate on": {
-          "one column": {
-            "input column": {
-              "type": "column",
-              "value": "MAKE"
-            }
-          }
-        }
-      }
-    }, {
-      "id": "0a8cd179-6008-46c9-104d-7fad3d89708a",
-      "operation": {
-        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
-        "name": "SQL Column Transformation"
-      },
-      "parameters": {
-        "input column alias": "x",
-        "formula": "initcap(x)",
-        "operate on": {
-          "multiple columns": {
-            "input columns": {
-              "selections": [{
-                "type": "typeList",
-                "values": ["string"]
-              }, {
-                "type": "columnList",
-                "values": ["FUELTYPE", "MAKE"]
-              }, {
-                "type": "indexRange",
-                "values": [2, 6]
-              }],
-              "excluding": false
-            }
-          }
-        }
-      }
-    }, {
-      "id": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
+      "id": "eb5b884d-2f51-f80d-b882-8e1d314c5b05",
       "operation": {
         "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
         "name": "Read DataFrame"
       },
       "parameters": {
-        "data source": "a2572977-729e-87ff-3c96-5f795b5d6635"
+        "data source": "46ef2e08-5633-82c4-72d7-03153db17834"
       }
     }, {
-      "id": "43448dab-d27c-9b82-b9f1-687116110c70",
+      "id": "3677e467-f564-ee84-7a07-cb6709701801",
       "operation": {
-        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
-        "name": "SQL Column Transformation"
+        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
+        "name": "Filter Columns"
       },
       "parameters": {
-        "formula": "initcap(x)",
-        "operate on": {
-          "multiple columns": {
-            "input columns": {
-              "selections": [{
-                "type": "typeList",
-                "values": ["numeric"]
-              }, {
-                "type": "indexRange",
-                "values": [2, 6]
-              }],
-              "excluding": false
-            }
-          }
+        "selected columns": {
+          "selections": [{
+            "type": "columnList",
+            "values": ["uid"]
+          }],
+          "excluding": false
         }
+      }
+    }, {
+      "id": "868d2486-eb10-0a0e-6e51-4f084330705c",
+      "operation": {
+        "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
+        "name": "SQL Transformation"
+      },
+      "parameters": {
+        "dataframe id": "act",
+        "expression": "SELECT Advertising_id FROM act WHERE advertising_id LIKE 'M%'"
+      }
+    }, {
+      "id": "fa247560-a22f-22ec-5636-b1510f12635f",
+      "operation": {
+        "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
+        "name": "SQL Transformation"
+      },
+      "parameters": {
+        "expression": "select * , sha2('Advertising_id',256) , sha2('user_id',256) as uid \nfrom df"
+      }
+    }, {
+      "id": "19499c0a-8d52-e5ed-3065-9da84c5c04c7",
+      "operation": {
+        "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
+        "name": "SQL Transformation"
+      },
+      "parameters": {
+        "expression": "SELECT * FROM df"
       }
     }],
     "connections": [{
       "from": {
-        "nodeId": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
+        "nodeId": "868d2486-eb10-0a0e-6e51-4f084330705c",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "3e5bb613-4c49-4950-67c1-cd7b236960da",
+        "nodeId": "03f58e08-920e-3914-c8f1-f2f711bd6185",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
+        "nodeId": "eb5b884d-2f51-f80d-b882-8e1d314c5b05",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "0a8cd179-6008-46c9-104d-7fad3d89708a",
+        "nodeId": "868d2486-eb10-0a0e-6e51-4f084330705c",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
+        "nodeId": "19499c0a-8d52-e5ed-3065-9da84c5c04c7",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "43448dab-d27c-9b82-b9f1-687116110c70",
+        "nodeId": "fa247560-a22f-22ec-5636-b1510f12635f",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "a69bf981-e6c5-6d63-afdc-a272c6ddf670",
+        "nodeId": "eb5b884d-2f51-f80d-b882-8e1d314c5b05",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "b46c9380-17b7-97aa-5e22-79f914e49124",
+        "nodeId": "19499c0a-8d52-e5ed-3065-9da84c5c04c7",
+        "portIndex": 0
+      }
+    }, {
+      "from": {
+        "nodeId": "fa247560-a22f-22ec-5636-b1510f12635f",
+        "portIndex": 0
+      },
+      "to": {
+        "nodeId": "3677e467-f564-ee84-7a07-cb6709701801",
         "portIndex": 0
       }
     }]
   },
   "thirdPartyData": {
     "gui": {
-      "name": "sql_col",
+      "name": "sql_trans",
       "description": "",
       "nodes": {
-        "a69bf981-e6c5-6d63-afdc-a272c6ddf670": {
+        "868d2486-eb10-0a0e-6e51-4f084330705c": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7636,
-            "y": 8634
+            "x": 7604,
+            "y": 8950
           }
         },
-        "43448dab-d27c-9b82-b9f1-687116110c70": {
+        "eb5b884d-2f51-f80d-b882-8e1d314c5b05": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 6978,
-            "y": 8727
+            "x": 7742,
+            "y": 8858
           }
         },
-        "b46c9380-17b7-97aa-5e22-79f914e49124": {
+        "19499c0a-8d52-e5ed-3065-9da84c5c04c7": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 6990,
-            "y": 8623
+            "x": 7844,
+            "y": 8945
           }
         },
-        "0a8cd179-6008-46c9-104d-7fad3d89708a": {
+        "03f58e08-920e-3914-c8f1-f2f711bd6185": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7233,
-            "y": 8727
+            "x": 7635,
+            "y": 9050
           }
         },
-        "3e5bb613-4c49-4950-67c1-cd7b236960da": {
+        "3677e467-f564-ee84-7a07-cb6709701801": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7488,
-            "y": 8727
+            "x": 7846,
+            "y": 9160
+          }
+        },
+        "fa247560-a22f-22ec-5636-b1510f12635f": {
+          "uiName": "",
+          "color": "#00B1EB",
+          "coordinates": {
+            "x": 7872,
+            "y": 9056
           }
         }
       }
@@ -191,9 +176,14 @@
     "datasources": [{
       "accessLevel": "writeRead",
       "params": {
-        "name": "auto-data_1",
-        "libraryFileParams": {
-          "libraryPath": "library://auto-data_1.csv",
+        "name": "act_data",
+        "libraryFileParams": null,
+        "downloadUri": null,
+        "googleSpreadsheetParams": null,
+        "jdbcParams": null,
+        "hdfsParams": null,
+        "externalFileParams": {
+          "url": "https://2weeks-landingbucket.s3.amazonaws.com/Actives_Staged_Result.csv",
           "fileFormat": "csv",
           "csvFileFormatParams": {
             "includeHeader": true,
@@ -202,16 +192,11 @@
             "customSeparator": null
           }
         },
-        "downloadUri": null,
-        "googleSpreadsheetParams": null,
-        "jdbcParams": null,
-        "hdfsParams": null,
-        "externalFileParams": null,
-        "datasourceType": "libraryFile",
+        "datasourceType": "externalFile",
         "visibility": "privateVisibility"
       },
-      "creationDateTime": "2023-02-22T14:06:48.765Z",
-      "id": "a2572977-729e-87ff-3c96-5f795b5d6635",
+      "creationDateTime": "2023-02-20T15:57:23.785Z",
+      "id": "46ef2e08-5633-82c4-72d7-03153db17834",
       "ownerName": "user",
       "ownerId": "00000000-0000-0000-0000-000000000001"
     }]
@@ -219,7 +204,7 @@
   "variables": {
 
   },
-  "id": "5ec0ac53-c10b-41ba-878c-b890a349467f",
+  "id": "b77dc6e5-bd10-4206-9622-af88a740d741",
   "metadata": {
     "type": "batch",
     "apiVersion": "1.4.3"

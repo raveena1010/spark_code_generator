@@ -136,7 +136,6 @@ class Node_Operation:
             else:
                 code = f"{df_name} = spark.read.{file_format}('{url}')"
         self.code_file.write(code + '\n')
-        #add_child_in_output(self,node_id,df_name) #not needed
 
     def filter_rows(self, node):
         node_id = node['id']
@@ -152,7 +151,7 @@ class Node_Operation:
         #get the parent of this and update that as schema as no change in cols
         schema = self.cached_df_schema[parent_name]
         self.cached_df_schema[df_name] = schema
-        #add_child_in_output(self,node_id,df_name)
+
 
     def filter_columns(self, node):
         node_id = node['id']
@@ -167,7 +166,6 @@ class Node_Operation:
         code = f"{df_name} = {parent_name}.select({required_cols})"
         self.code_file.write(code + '\n')
         update_schema_after_filtercol(self,schema, required_cols, df_name)
-        #add_child_in_output(self,node_id,df_name)    
 
     def filter_col_bylist(self, values, is_exclude, schema):
         cols = list(schema.keys())
@@ -229,7 +227,7 @@ class Node_Operation:
         schema = self.cached_df_schema[left_parent_name ]
         self.dataframe_name[node_id] = df_name
         self.cached_df_schema[df_name] = schema
-        #add_child_in_output(self,node_id,df_name)
+
 
     def join(self,node):
         node_id = node['id']
@@ -334,8 +332,8 @@ class Node_Operation:
         self.code_file.write(code + '\n')
         #get the parent of this and update that as schema as no change in cols
         self.cached_df_schema[df_name] = schema
-        #add_child_in_output(self,node_id,df_name)
-    
+
+
 
     def sql_column_transformation(self,node):
         node_id = node['id']
@@ -348,47 +346,82 @@ class Node_Operation:
         parent_columns = list(schema.keys())
         input_col_alias = node['parameters'].get("input column alias",'x')
         transformation = ''
+        new_schema ={}
+        for i in schema:
+            new_schema[i] = schema[i]
         if formula:
             operate_on = node['parameters']['operate on']
             if 'one column' in operate_on:
-                if operate_on['one column']['input column']['type'] == 'column':
-                    col = operate_on['one column']['input column']['value']
-                    col = check_column_is_valid(col)
-                    formula.replace(input_col_alias,col)
-                else:
-                    col = parent_columns[operate_on['one column']['input column']['value']]
-                    col = check_column_is_valid(col)
-                    formula = formula.replace(input_col_alias,col)
+                new_schema,transformation = self.sql_column_operate_one_column(operate_on,parent_columns,schema,input_col_alias,formula,new_schema)
             if 'multiple columns' in operate_on:
-                selections = operate_on['multiple columns']['input columns']['selections']
-                is_exclude = operate_on['multiple columns']['input columns']['excluding']
-                required_cols = fetch_columns_to_add(self,selections,is_exclude,schema)
-                
-                for i in required_cols:
-                    col = check_column_is_valid(i)
-                    formula1 = formula.replace(input_col_alias,col) 
-                    transformation = transformation + f'.withColumn("{i}",expr("{formula1}"))'
-
+                new_schema,transformation = self.sql_column_operate_multi_columns(operate_on,schema,formula,input_col_alias,new_schema)
             code = f"{df_name} = {parent_name}{transformation}"
             self.code_file.write(code + '\n')
         else:
             code = f"{df_name} = {parent_name}"
             self.code_file.write(code + '\n')   
-        #get the parent of this and update that as schema as no change in cols
-        self.cached_df_schema[df_name] = schema
-        #add_child_in_output(self,node_id,df_name)
-      
+
+        self.cached_df_schema[df_name] = new_schema
+
+
+
+    def sql_column_operate_one_column(self,operate_on,parent_columns,schema,input_col_alias,formula,new_schema):
+        new_col_alias =''
+        transformation = ''
+        if operate_on['one column'].get('output'):
+                if operate_on['one column']['output'].get('append new column'):
+                    new_col_alias = operate_on['one column']['output']['append new column']['output column']
+                if operate_on['one column']['input column']['type'] == 'column':
+                    col = operate_on['one column']['input column']['value']
+                else:
+                    col = parent_columns[operate_on['one column']['input column']['value']]               
+                column = col+new_col_alias
+                new_schema[column] = schema[col]
+                col = check_column_is_valid(col)
+                x = formula.find('(',1)
+                formula = formula[:x] + formula[x:].replace(input_col_alias,col)
+                transformation = f'.withColumn("{column}",expr("{formula}"))'
+        return new_schema,transformation
+            
+    def sql_column_operate_multi_columns(self,operate_on,schema,formula,input_col_alias,new_schema):
+        new_col_alias = ''
+        transformation = ''
+        if operate_on['multiple columns'].get('output'):
+                new_col_alias = operate_on['multiple columns']['output']['append new columns']['column name prefix']
+        selections = operate_on['multiple columns']['input columns']['selections']
+        is_exclude = operate_on['multiple columns']['input columns']['excluding']
+        required_cols = fetch_columns_to_add(self,selections,is_exclude,schema)
+        x = formula.find('(',1)
+        for i in required_cols:
+            column = i+ new_col_alias
+            new_schema[column] = schema[i]
+            col = check_column_is_valid(i)
+            formula1 = formula[:x] + formula[x:].replace(input_col_alias,col) 
+            transformation = transformation + f'.withColumn("{column}",expr("{formula1}"))'
+        return new_schema,transformation
+    
     def sql_transformation(self,node):
+        new_schema = {}
         node_id = node['id']
         df_name = self.dataframe_name[node_id]
         set_df_name_for_child(self,node_id,df_name)
-        expression = node[ "parameters"].get('expression')
+        expression = node[ "parameters"].get('expression','')
+        parents_id = self.pn_obj.child_parent[node_id]
+        parent_name = self.dataframe_name[parents_id[0]]
+        schema = self.cached_df_schema[parent_name]
+        df = node[ "parameters"].get('dataframe id','df')
+        expression = return_valid_exp(expression)
+        expression = re.sub('["]', "'",expression) 
         if expression:
-            register_table = f'{df_name}.registerTempTable("df")'
+            register_table = f'{parent_name}.registerTempTable("{df}")'
             self.code_file.write(register_table + '\n')
-            code = f'{df_name} = spark.sql({expression})'
+            code = f'{df_name} = spark.sql("{expression}")'
             self.code_file.write(code + '\n')
 
+        new_schema = update_schema_after_sql_transformation(schema,expression)  
+        print("jfd",new_schema,df_name) 
+        self.cached_df_schema[df_name] = new_schema
+        
     def projection(self,node):
         project_schema = {}
         node_id = node['id']
@@ -449,7 +482,7 @@ class Node_Operation:
             new_schema[key]= self.schema_update[key]
         self.code_file.write(code + '\n')
         self.cached_df_schema[df_name] = new_schema
-        print(schema)
+
         
     
 
@@ -468,7 +501,7 @@ class Node_Operation:
         if "replace with custom value" in strategy:
             code = self.replace_with_custom_value(code,strategy,values_to_consider,required_cols)
         if "remove row" in strategy: 
-            code = self.remove_row(code,strategy,values_to_consider,required_cols)   
+            code = self.remove_row(code,values_to_consider,required_cols)   
         
         return code     
 
@@ -500,7 +533,7 @@ class Node_Operation:
             code = code + f".fillna({new_value},{required_cols})"
         return code
          
-    def remove_row(self,code,strategy,values_to_consider,required_cols):
+    def remove_row(self,code,values_to_consider,required_cols):
             #User_defined_missing_value
         code = code+ f".dropna('any',subset={required_cols})"
         if len(values_to_consider) > 0:
