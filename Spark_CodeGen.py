@@ -80,7 +80,7 @@ class Generate_SparkCode:
                             fun_to_call = [operation_to_do, node_details]
                             delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
                             self.visited[child] = True
-                            #print("Schema:",del_obj.cached_df_schema)
+
 
 
 job = Generate_SparkCode()

@@ -49,11 +49,9 @@ class Node_Operation:
                 datasource_name = return_valid_df_name(datasource_name)
                 if datasource_name not in self.dataframe_name:
                     if 'library' in data_from:
-                        url = 'loc'
-                        #url = input("Give file location of {0} data ".format(datasource_name)).strip()
-                        #url = cleanse_data(url)
-                    else:
-                        url = '"' + datasource['params'][data_from]['url'] + '"'   
+                        url = input("Give file location of {0} data ".format(datasource_name)).strip()
+                        url = cleanse_data(url)
+
                     self.get_schema_details_from_user(datasource_name)
                     if file_format == "csv":
                         include_header = datasource['params'][data_from]['csvFileFormatParams']['includeHeader']
@@ -102,7 +100,7 @@ class Node_Operation:
 
         self.dataframe_name[node['id']] = datasource_name
         set_df_name_for_child(self,node_id, datasource_name)
-        #add_child_in_output(self,node_id,datasource_name) 
+
         
 
     def write_dataframe(self, node):
@@ -115,12 +113,12 @@ class Node_Operation:
             data_from = datasource['params']['datasourceType'] + "Params"
             file_format = datasource['params'][data_from]['fileFormat']
             datasource_name = datasource['params']['name']
-            #url = '"' + datasource['params'][data_from]['url'] + '"'
+            url = datasource['params'][data_from]['url']
             
-            #if 'library' in url:
-                #url = input("Give file location of {0} data ".format(datasource_name)).strip()
-                #url = cleanse_data(url)
-            #code = f"{df_name}.write.{file_format}.path('{url}')"
+            if 'library' in url:
+                url = input("Give file location of {0} data ".format(datasource_name)).strip()
+                url = cleanse_data(url)
+            code = f"{df_name}.write.{file_format}.path('{url}')"
 
         else:
             url = input(f"Give file location to save {df_name}").strip()
@@ -142,11 +140,14 @@ class Node_Operation:
         df_name = self.dataframe_name[node_id]
         set_df_name_for_child(self,node_id,df_name)
         condition = node["parameters"]['condition']
-        condition = return_valid_exp(condition)
-        condition = condition.replace("'",'"')
         parents_id = self.pn_obj.child_parent[node_id]
         parent_name = self.dataframe_name[parents_id[0]]
-        code = f"{df_name} = {parent_name}.filter('{condition}')"
+        if condition != '':
+            condition = return_valid_exp(condition)
+            condition = condition.replace("'",'"')
+            code = f"{df_name} = {parent_name}.filter('{condition}')"
+        else:
+            code =  f"{df_name} = {parent_name}"
         self.code_file.write(code + '\n')
         #get the parent of this and update that as schema as no change in cols
         schema = self.cached_df_schema[parent_name]
@@ -294,7 +295,7 @@ class Node_Operation:
             
             cols_to_remove.append(right_col_for_join)
             if right_col_for_join not in drop_cols:
-                drop_cols = drop_cols +f".drop('right.{right_col_for_join}')"
+                drop_cols = drop_cols +f".drop({right_parent}.{right_col_for_join})"
             left_col_for_join = f"col('left.{left_col_for_join}')"
             right_col_for_join = f"col('right.{right_col_for_join}')"
             if col == len(join_columns)-1:
@@ -349,18 +350,14 @@ class Node_Operation:
         new_schema ={}
         for i in schema:
             new_schema[i] = schema[i]
-        if formula:
-            operate_on = node['parameters']['operate on']
-            if 'one column' in operate_on:
-                new_schema,transformation = self.sql_column_operate_one_column(operate_on,parent_columns,schema,input_col_alias,formula,new_schema)
-            if 'multiple columns' in operate_on:
-                new_schema,transformation = self.sql_column_operate_multi_columns(operate_on,schema,formula,input_col_alias,new_schema)
-            code = f"{df_name} = {parent_name}{transformation}"
-            self.code_file.write(code + '\n')
-        else:
-            code = f"{df_name} = {parent_name}"
-            self.code_file.write(code + '\n')   
 
+        operate_on = node['parameters']['operate on']
+        if 'one column' in operate_on:  
+            new_schema,transformation = self.sql_column_operate_one_column(operate_on,parent_columns,schema,input_col_alias,formula,new_schema)
+        if 'multiple columns' in operate_on:
+            new_schema,transformation = self.sql_column_operate_multi_columns(operate_on,schema,formula,input_col_alias,new_schema)
+        code = f"{df_name} = {parent_name}{transformation}"
+        self.code_file.write(code + '\n')
         self.cached_df_schema[df_name] = new_schema
 
 
@@ -375,29 +372,36 @@ class Node_Operation:
                     col = operate_on['one column']['input column']['value']
                 else:
                     col = parent_columns[operate_on['one column']['input column']['value']]               
-                column = col+new_col_alias
+                column = new_col_alias+col
                 new_schema[column] = schema[col]
-                col = check_column_is_valid(col)
-                x = formula.find('(',1)
-                formula = formula[:x] + formula[x:].replace(input_col_alias,col)
-                transformation = f'.withColumn("{column}",expr("{formula}"))'
+                if formula:
+                    col = check_column_is_valid(col)
+                    x = formula.find('(',1)
+                    formula = formula[:x] + formula[x:].replace(input_col_alias,col)
+                    transformation = f'.withColumn("{column}",expr("{formula}"))'
+                else:
+                    transformation = f'.withColumn("{column}",col("{col}"))'   
         return new_schema,transformation
             
     def sql_column_operate_multi_columns(self,operate_on,schema,formula,input_col_alias,new_schema):
         new_col_alias = ''
         transformation = ''
-        if operate_on['multiple columns'].get('output'):
+        if operate_on['multiple columns']['output'].get('append new columns'):
                 new_col_alias = operate_on['multiple columns']['output']['append new columns']['column name prefix']
         selections = operate_on['multiple columns']['input columns']['selections']
         is_exclude = operate_on['multiple columns']['input columns']['excluding']
         required_cols = fetch_columns_to_add(self,selections,is_exclude,schema)
-        x = formula.find('(',1)
-        for i in required_cols:
-            column = i+ new_col_alias
-            new_schema[column] = schema[i]
-            col = check_column_is_valid(i)
-            formula1 = formula[:x] + formula[x:].replace(input_col_alias,col) 
-            transformation = transformation + f'.withColumn("{column}",expr("{formula1}"))'
+        if formula:
+            x = formula.find('(',1)
+        for col in required_cols:
+            column = new_col_alias+col
+            new_schema[column] = schema[col]
+            if formula:
+                col = check_column_is_valid(col)
+                formula1 = formula[:x] + formula[x:].replace(input_col_alias,col) 
+                transformation = transformation + f'.withColumn("{column}",expr("{formula1}"))'
+            else:
+                transformation = transformation + f'.withColumn("{column}",col("{col}"))' 
         return new_schema,transformation
     
     def sql_transformation(self,node):
@@ -419,7 +423,6 @@ class Node_Operation:
             self.code_file.write(code + '\n')
 
         new_schema = update_schema_after_sql_transformation(schema,expression)  
-        print("jfd",new_schema,df_name) 
         self.cached_df_schema[df_name] = new_schema
         
     def projection(self,node):

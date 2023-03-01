@@ -3,12 +3,6 @@ spark = SparkSession.builder.appName("SparkApp").master("local[5]").getOrCreate(
 from pyspark.sql.functions import col
 from pyspark.sql.functions import expr
 from pyspark.sql.functions import when
-act_data = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('"https://2weeks-landingbucket.s3.amazonaws.com/Actives_Staged_Result.csv"')
-act_data.registerTempTable("act")
-act_data_b1 = spark.sql("SELECT Advertising_id FROM act WHERE advertising_id LIKE 'M%'")
-act_data.registerTempTable("df")
-act_data_b2 = spark.sql("SELECT * FROM df")
-act_data_b1 = act_data_b1.select(['advertising_id'])
-act_data_b2.registerTempTable("df")
-act_data_b2 = spark.sql("select * , sha2('Advertising_id',256) , sha2('user_id',256) as uid from df")
-act_data_b2 = act_data_b2.select(['uid'])
+StockPrice = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('lg')
+StockPrice_b1 = StockPrice.filter('   open > 100 and date = "05-01-2016"')
+StockPrice_b2 = StockPrice

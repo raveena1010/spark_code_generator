@@ -87,9 +87,9 @@ def fetch_columns_to_add(self,selections,is_exclude,schema):
             cols_to_add = self.filter_col_byindex(index_range, is_exclude, schema)
             req_col.extend(cols_to_add)
 
-        required_cols = []
-        [required_cols.append(x) for x in req_col if x not in required_cols]  
-        return required_cols
+    required_cols = []
+    [required_cols.append(x) for x in req_col if x not in required_cols]  
+    return required_cols
       
 #Find respective left ,right parent
 def find_left_right_parent(self,node_id,parents_id):

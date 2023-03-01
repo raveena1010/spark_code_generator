@@ -40,7 +40,7 @@ def return_valid_df_name(df_name):
     return  re.sub("[^a-zA-Z0-9_]", "", df_name)   
 
 def return_valid_exp(exp):
-   return re.sub("[\n\r]", "", exp) 
+   return re.sub("[\n\r]", " ", exp) 
 
 def check_column_is_valid(col):
     if re.findall("[^a-zA-Z0-9_]",col):
