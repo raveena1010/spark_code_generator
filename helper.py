@@ -16,6 +16,7 @@ def compare_datatype(schema):
     return datatype_match
 
 def cleanse_data(str):
+    str = str.strip()
     return re.sub(r'[\[\]\'"\(\)\{\}]', '', str)
 
 def remove_space(list_data):

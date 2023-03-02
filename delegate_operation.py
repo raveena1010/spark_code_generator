@@ -23,6 +23,7 @@ class Node_Operation:
         self.read_count = 1
         self.datasource_ids = {}
         self.datasource_read_count = {}
+        self.s3_path = ''
 
 
     def get_schema_details_from_user(self,datasource_name):
@@ -48,11 +49,11 @@ class Node_Operation:
                 datasource_name = datasource['params']['name']
                 datasource_name = return_valid_df_name(datasource_name)
                 if datasource_name not in self.dataframe_name:
-                    if 'library' in data_from:
-                        url = input("Give file location of {0} data ".format(datasource_name)).strip()
-                        url = cleanse_data(url)
-                    if 'external' in data_from:
-                        url= datasource['params'][data_from]['url']
+                    url = input("Give file location of {0} data ".format(datasource_name)).strip()
+                    url = cleanse_data(url)
+                    split_url = url.split('/')
+                    if 's3' in split_url[0]:
+                        self.s3_path  = split_url[0]+'//'+split_url[2]
                     self.get_schema_details_from_user(datasource_name)
                     if file_format == "csv":
                         include_header = datasource['params'][data_from]['csvFileFormatParams']['includeHeader']
@@ -117,18 +118,21 @@ class Node_Operation:
             url = datasource['params'][data_from]['libraryPath']
             
             if 'library' in url:
-                url = url.split('://')[-1] + str(random.randint(1,30))
+                url = url.split('://')[-1] + '_'+str(random.randint(1,30))
                 #url = input("Give file location of {0} data ".format(datasource_name)).strip()
                 #url = cleanse_data(url)
+                if self.s3_path:
+                    url = self.s3_path + '/' + url
+                print(f"-----  Output for  {datasource_name} will be in: "+url+'   --------')
         else:
             url = input(f"Give file location to save {df_name}").strip()
             url = cleanse_data(url)
             file_format = input(f"Give file_format of {df_name} ").strip()
             file_format = cleanse_data(file_format)
         if file_format == 'csv':
-            code = f"{df_name}.write.option('header',True).option('delimiter',',').option('inferschema',True).csv('{url}')"
+            code = f"{df_name}.write.mode('overwrite').option('header',True).option('delimiter',',').option('inferschema',True).csv('{url}')"
         else:
-            code = f"{df_name}.write.{file_format}('{url}')"
+            code = f"{df_name}.write.mode('overwrite').{file_format}('{url}')"
         self.code_file.write(code + '\n')
 
     def filter_rows(self, node):
