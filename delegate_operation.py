@@ -51,7 +51,8 @@ class Node_Operation:
                     if 'library' in data_from:
                         url = input("Give file location of {0} data ".format(datasource_name)).strip()
                         url = cleanse_data(url)
-
+                    if 'external' in data_from:
+                        url= datasource['params'][data_from]['url']
                     self.get_schema_details_from_user(datasource_name)
                     if file_format == "csv":
                         include_header = datasource['params'][data_from]['csvFileFormatParams']['includeHeader']
@@ -113,26 +114,21 @@ class Node_Operation:
             data_from = datasource['params']['datasourceType'] + "Params"
             file_format = datasource['params'][data_from]['fileFormat']
             datasource_name = datasource['params']['name']
-            url = datasource['params'][data_from]['url']
+            url = datasource['params'][data_from]['libraryPath']
             
             if 'library' in url:
-                url = input("Give file location of {0} data ".format(datasource_name)).strip()
-                url = cleanse_data(url)
-            code = f"{df_name}.write.{file_format}.path('{url}')"
-
+                url = url.split('://')[-1] + str(random.randint(1,30))
+                #url = input("Give file location of {0} data ".format(datasource_name)).strip()
+                #url = cleanse_data(url)
         else:
             url = input(f"Give file location to save {df_name}").strip()
             url = cleanse_data(url)
             file_format = input(f"Give file_format of {df_name} ").strip()
             file_format = cleanse_data(file_format)
-            if file_format == 'csv':
-                include_header = input(f"Include header(True/False) for {df_name} ").strip()
-                separator_type = input(f"Separator type for {df_name} ").strip()
-                include_header = cleanse_data(include_header)
-                separator_type = cleanse_data(separator_type)
-                code = f"{df_name} = spark.read.option('header',{include_header}).option('delimiter','{separator_type}').option('inferschema',True).csv('{url}')"
-            else:
-                code = f"{df_name} = spark.read.{file_format}('{url}')"
+        if file_format == 'csv':
+            code = f"{df_name}.write.option('header',True).option('delimiter',',').option('inferschema',True).csv('{url}')"
+        else:
+            code = f"{df_name}.write.{file_format}('{url}')"
         self.code_file.write(code + '\n')
 
     def filter_rows(self, node):
@@ -222,6 +218,8 @@ class Node_Operation:
         parents_id = self.pn_obj.child_parent[node_id] 
         left_parent_name , right_parent_name  = find_left_right_parent(self,node_id,parents_id)
         df_name = left_parent_name +'_'+ right_parent_name +'_union'
+        if df_name in self.dataframe_name.values():
+            df_name = df_name + str(random.randint(1,30))
         code = f"{df_name} = {left_parent_name }.union({right_parent_name })"
         self.code_file.write(code + '\n')
         set_df_name_for_child(self,node_id,df_name)
@@ -245,6 +243,8 @@ class Node_Operation:
         left_parent_schema = self.cached_df_schema[left_parent_name]
         right_parent_schema = self.cached_df_schema[right_parent_name]
         df_name = left_parent_name+'_'+right_parent_name+'_'+'join'
+        if df_name in self.dataframe_name.values():
+            df_name = df_name + str(random.randint(1,30))
         self.dataframe_name[node_id] = df_name 
         set_df_name_for_child(self,node_id,df_name)
         left_cols = list(left_parent_schema.keys())
@@ -366,30 +366,33 @@ class Node_Operation:
         new_col_alias =''
         transformation = ''
         if operate_on['one column'].get('output'):
-                if operate_on['one column']['output'].get('append new column'):
-                    new_col_alias = operate_on['one column']['output']['append new column']['output column']
-                if operate_on['one column']['input column']['type'] == 'column':
-                    col = operate_on['one column']['input column']['value']
-                else:
-                    col = parent_columns[operate_on['one column']['input column']['value']]               
-                column = new_col_alias+col
-                new_schema[column] = schema[col]
-                if formula:
-                    col = check_column_is_valid(col)
-                    x = formula.find('(',1)
-                    formula = formula[:x] + formula[x:].replace(input_col_alias,col)
-                    transformation = f'.withColumn("{column}",expr("{formula}"))'
-                else:
-                    transformation = f'.withColumn("{column}",col("{col}"))'   
+            if operate_on['one column']['output'].get('append new column'):
+                new_col_alias = operate_on['one column']['output']['append new column']['output column']
+        if operate_on['one column']['input column']['type'] == 'column':
+            col = operate_on['one column']['input column']['value']
+        else:
+            col = parent_columns[operate_on['one column']['input column']['value']]               
+        column = new_col_alias+col
+        new_schema[column] = schema[col]
+
+        if formula:
+            col = check_column_is_valid(col)
+            x = formula.find('(',1)
+            formula = formula[:x] + formula[x:].replace(input_col_alias,col)
+            transformation = f'.withColumn("{column}",expr("{formula}"))'
+        else:
+            transformation = f'.withColumn("{column}",col("{col}"))'   
         return new_schema,transformation
             
     def sql_column_operate_multi_columns(self,operate_on,schema,formula,input_col_alias,new_schema):
         new_col_alias = ''
         transformation = ''
-        if operate_on['multiple columns']['output'].get('append new columns'):
+        multi_col = operate_on['multiple columns'] 
+        if multi_col.get('output'):
+            if multi_col['output'].get('append new columns'):
                 new_col_alias = operate_on['multiple columns']['output']['append new columns']['column name prefix']
-        selections = operate_on['multiple columns']['input columns']['selections']
-        is_exclude = operate_on['multiple columns']['input columns']['excluding']
+        selections = multi_col['input columns']['selections']
+        is_exclude = multi_col['input columns']['excluding']
         required_cols = fetch_columns_to_add(self,selections,is_exclude,schema)
         if formula:
             x = formula.find('(',1)

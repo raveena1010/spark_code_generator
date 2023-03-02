@@ -5,7 +5,7 @@ import root_node
 
 workflow_path = 'Workflow_CaseStudy.json'
 f = open(workflow_path)
-code_file = open('code_output', 'w')
+code_file = open('output_code', 'w')
 
 data = json.load(f)
 pn_obj = root_node.Get_Root_Node(data)
@@ -48,7 +48,7 @@ class Generate_SparkCode:
             fun_to_call = [operation_to_do, node_details, data]
             delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
             self.visited[node_id] = True
-            print("Schema:r read",del_obj.cached_df_schema)
+            #print("Schema:r read",del_obj.cached_df_schema)
 
 
     def is_all_parent_visited(self,child):
@@ -65,7 +65,6 @@ class Generate_SparkCode:
         queue.append(node)
         self.visited[node] = True
         while queue:
-            
             s = queue.pop(0)
             print('order of execution', s)
             if s in pn_obj.relation_dict:
@@ -80,6 +79,7 @@ class Generate_SparkCode:
                             fun_to_call = [operation_to_do, node_details]
                             delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
                             self.visited[child] = True
+                            #print('col',del_obj.cached_df_schema)
 
 
 

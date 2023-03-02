@@ -123,7 +123,7 @@ def update_schema_after_sql_transformation(schema,formula):
     existing_cols = list(schema.keys())
     from_index = formula.lower().find('from') 
     select_index = formula.find('select') + 7
-    list_cols = formula[select_index:from_index].split(' ,')
+    list_cols = formula[select_index:from_index].split(',')
     for i in list_cols:
         i = i.strip()
         if '*' in i:
@@ -140,7 +140,6 @@ def update_schema_after_sql_transformation(schema,formula):
                         new_schema[j] = schema[j]   
                     else:
                         i = i[:from_index].strip()
-                        new_schema[i] = schema[j]
-                              
+                        new_schema[i] = schema[j]                      
     return new_schema               
 
