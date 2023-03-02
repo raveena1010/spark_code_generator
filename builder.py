@@ -121,25 +121,42 @@ def fetch_user_defined_missing_value(user_defined_missing_values):
 def update_schema_after_sql_transformation(schema,formula):
     new_schema = {}
     existing_cols = list(schema.keys())
+    formula = formula.strip()
     from_index = formula.lower().find('from') 
-    select_index = formula.find('select') + 7
+    select_index = formula.lower().find('Select') + 7
+
     list_cols = formula[select_index:from_index].split(',')
-    for i in list_cols:
-        i = i.strip()
-        if '*' in i:
-            for i in schema:
-                new_schema[i] = schema[i]
-        for j in existing_cols:
-            if j.lower() in i.lower():
-                if 'as' in i.lower():
-                    as_index = i.lower().find('as')
-                    alias = i[as_index+2:].strip()
-                    new_schema[alias] = schema[j]
-                else:
-                    if j.lower() == i.lower():
-                        new_schema[j] = schema[j]   
+    new_list = []
+    for i in range(len(list_cols)):
+        if '(' in list_cols[i] and ')' not in list_cols[i] :
+            y = list_cols[i] + ','+list_cols[i+1]
+            new_list.append(y)
+        
+        elif '(' not in list_cols[i] and ')' in list_cols[i]:
+            pass
+            
+        else:
+            new_list.append(list_cols[i])
+            
+
+
+        list_cols = formula[select_index:from_index].split(',')
+        for i in list_cols:
+            i = i.strip()
+            if '*' in i:
+                for i in schema:
+                    new_schema[i] = schema[i]
+            for j in existing_cols:
+                if j.lower() in i.lower():
+                    if 'as' in i.lower():
+                        as_index = i.lower().find('as')
+                        alias = i[as_index+2:].strip()
+                        new_schema[alias] = schema[j]
                     else:
-                        i = i[:from_index].strip()
-                        new_schema[i] = schema[j]                      
-    return new_schema               
+                        if j.lower() == i.lower():
+                            new_schema[j] = schema[j]   
+                        else:
+                            i = i[:from_index].strip()
+                            new_schema[i] = schema[j]                      
+        return new_schema               
 

@@ -1,0 +1,16 @@
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("SparkApp").master("local[5]").getOrCreate()
+from pyspark.sql.functions import col
+from pyspark.sql.functions import expr
+from pyspark.sql.functions import when
+StockPrice = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('/content/StockPrice.csv')
+Stockcompanies = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('/content/Stockcompanies.csv')
+StockPrice = StockPrice.select(['date', 'symbol', 'open', 'close', 'high', 'volume'])
+StockPrice_b1 = StockPrice.filter('symbol = "WLTW"')
+StockPrice_b2 = StockPrice.filter('open <200 and close >200 ')
+StockPrice_b1.write.mode('overwrite').option('header',True).option('delimiter',',').option('inferschema',True).csv('staged_result_18')
+StockPrice_b2 = StockPrice_b2.withColumn("open",expr("int(open)")).withColumn("close",expr("int(close)"))
+Stockcompanies = Stockcompanies.alias("df").select(col('Security').alias('Company_Name'),'Sector','Ticker_symbol',)
+Stockcompanies = Stockcompanies.withColumn("Company_Name",expr("upper(Company_Name)"))
+StockPrice_b2_Stockcompanies_join = StockPrice_b2.alias('left').join(Stockcompanies.alias('right'),[col('left.symbol')==col('right.Ticker_symbol')],'inner').drop(Stockcompanies.Ticker_symbol)
+StockPrice_b2_Stockcompanies_join.write.mode('overwrite').option('header',True).option('delimiter',',').option('inferschema',True).csv('output_24')

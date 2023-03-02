@@ -66,7 +66,7 @@ class Generate_SparkCode:
         self.visited[node] = True
         while queue:
             s = queue.pop(0)
-            print('order of execution', s)
+            #print('order of execution', s)
             if s in pn_obj.relation_dict:
                 for child in pn_obj.relation_dict[s]:
                     can_execute_child = self.is_all_parent_visited(child)
@@ -84,6 +84,6 @@ class Generate_SparkCode:
 
 
 job = Generate_SparkCode()
-print("Schema:",del_obj.cached_df_schema)
+#print("Schema:",del_obj.cached_df_schema)
 #print("Df name:",del_obj.dataframe_name )
 
