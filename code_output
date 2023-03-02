@@ -1,0 +1,8 @@
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.appName("SparkApp").master("local[5]").getOrCreate()
+from pyspark.sql.functions import col
+from pyspark.sql.functions import expr
+from pyspark.sql.functions import when
+StockPrice = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('lg')
+StockPrice_b1 = StockPrice.filter('   open > 100 and date = "05-01-2016"')
+StockPrice_b2 = StockPrice

@@ -1,0 +1,43 @@
+For every operation
+1) we need to set df_name for child if it have brach it has effect 
+    node_id = node['id']
+    df_name = self.dataframe_name[node_id]  
+    set_df_name_for_child(self,node_id,df_name)
+
+
+2) If branch is there then add it in code file
+#add_child_in_output(self,node_id,self.dataframe_name[node_id])
+
+3) Trace the Schema After Operation
+Get the parent of this and update that as schema as no change in cols
+This is required as df_name might change with branching but not the schema 
+
+Applicable for union , filter rows,sort , sql column transformation
+parents_id = self.pn_obj.child_parent[node_id]
+parent_name = self.dataframe_name[parents_id[0]]
+schema = self.cached_df_schema[parent_name]
+self.cached_df_schema[df_name] = schema
+
+                       (or)
+Schema will be reflected with filter col , join operation etc
+#Update the schema detail if the present schema is affected 
+def update_schema_after_filtercol(self,schema,cols_to_add,df_name):
+    new_schema = {}
+    for i in schema:
+        if i in cols_to_add:
+            new_schema[i] = schema[i]
+    self.cached_df_schema[df_name] = new_schema
+
+4)Called if we have option to select columns using names,index,datatype
+def fetch_columns_to_add(self,selections,is_exclude,schema)
+
+5)To find right left, right parent
+#applicable for join, union
+def find_left_right_parent(self,node_id,parents_id):
+
+
+--------------------------------------------------------------
+
+
+
+
