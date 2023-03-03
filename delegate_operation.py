@@ -163,7 +163,12 @@ class Node_Operation:
         schema = self.cached_df_schema[parent_name]
         selections = node['parameters']["selected columns"]['selections']
         is_exclude = node['parameters']["selected columns"]['excluding']
-        required_cols = fetch_columns_to_add(self,selections,is_exclude,schema)
+        cols = fetch_columns_to_add(self,selections,is_exclude,schema)
+        required_cols = []
+        for i in schema:
+            if i in cols:
+                required_cols.append(i)
+
         code = f"{df_name} = {parent_name}.select({required_cols})"
         self.code_file.write(code + '\n')
         update_schema_after_filtercol(self,schema, required_cols, df_name)
