@@ -3,13 +3,13 @@ spark = SparkSession.builder.appName("SparkApp").master("local[5]").getOrCreate(
 from pyspark.sql.functions import col
 from pyspark.sql.functions import expr
 from pyspark.sql.functions import when
-StockPrice = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('ln')
-Stockcompanies = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('df')
-StockPrice = StockPrice.withColumn("newdate",col("date"))
-StockPrice.registerTempTable("df")
-StockPrice = spark.sql("select newdate, symbol, open,close from df")
-Stockcompanies = Stockcompanies.withColumn("Headquarter",expr("upper(Headquarter)"))
-StockPrice_Stockcompanies_join = StockPrice.alias('left').join(Stockcompanies.alias('right'),[col('left.symbol')==col('right.Ticker_symbol')],'inner').drop(Stockcompanies.Ticker_symbol)
-StockPrice_Stockcompanies_join.registerTempTable("df")
-StockPrice_Stockcompanies_join = spark.sql("select * , sha2(symbol,256) as masked_symbol from df")
-StockPrice_Stockcompanies_join.write.mode('overwrite').option('header',True).option('delimiter',',').option('inferschema',True).csv('output_13')
+actives = spark.read.option('header',True).option('delimiter',',').option('inferSchema',True).csv('k')
+actives.registerTempTable("act")
+actives_b1 = spark.sql("SELECT advertising_id FROM act WHERE advertising_id LIKE 'M%'")
+actives_b2 = actives.select(['advertising_id', 'city', 'location_category', 'location_granularities', 'location_source', 'state', 'timestamp', 'user_id', 'user_latitude', 'user_longitude', 'month', 'date'])
+actives_b1 = actives_b1.select(['advertising_id'])
+actives_b2.registerTempTable("df")
+actives_b2 = spark.sql("SELECT * FROM df")
+actives_b2.registerTempTable("df")
+actives_b2 = spark.sql("select * , sha2('advertising_id',256)  as a_id, sha2('user_id',256)  as u_id from df")
+actives_b2 = actives_b2.select(['a_id', 'u_id'])

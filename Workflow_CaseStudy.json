@@ -1,248 +1,203 @@
 {
   "workflow": {
     "nodes": [{
-      "id": "13c59bad-a2b1-ca20-15fd-b2ef6df2de77",
+      "id": "03f58e08-920e-3914-c8f1-f2f711bd6185",
       "operation": {
-        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
-        "name": "SQL Column Transformation"
+        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
+        "name": "Filter Columns"
       },
       "parameters": {
-        "input column alias": "x",
-        "operate on": {
-          "multiple columns": {
-            "input columns": {
-              "selections": [{
-                "type": "columnList",
-                "values": ["date"]
-              }],
-              "excluding": false
-            },
-            "output": {
-              "append new columns": {
-                "column name prefix": "new"
-              }
-            }
-          }
+        "selected columns": {
+          "selections": [{
+            "type": "columnList",
+            "values": ["advertising_id"]
+          }],
+          "excluding": false
         }
       }
     }, {
-      "id": "7da585cb-6351-b39f-2464-96a8ca0233ad",
+      "id": "eb5b884d-2f51-f80d-b882-8e1d314c5b05",
       "operation": {
         "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
         "name": "Read DataFrame"
       },
       "parameters": {
-        "data source": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833"
+        "data source": "43eb02ab-7e80-63b8-3b13-6e711666d6e9"
       }
     }, {
-      "id": "55f65626-49f8-a9d8-f4bf-c6108058aca6",
+      "id": "5d737576-f439-0819-d0c7-6642485812ef",
       "operation": {
-        "id": "bf082da2-a0d9-4335-a62f-9804217a1436",
-        "name": "Write DataFrame"
+        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
+        "name": "Filter Columns"
       },
       "parameters": {
-        "data source": "de1c3271-85f1-07b5-1f6a-868d81607185"
-      }
-    }, {
-      "id": "ea5e335b-d877-7410-b901-01c7ef76cc9f",
-      "operation": {
-        "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
-        "name": "SQL Transformation"
-      },
-      "parameters": {
-        "dataframe id": "df",
-        "expression": "select * , sha2(symbol,256) as masked_symbol from df"
-      }
-    }, {
-      "id": "99c37b47-ce55-31a4-672c-530e6844b3c6",
-      "operation": {
-        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
-        "name": "Read DataFrame"
-      },
-      "parameters": {
-        "data source": "1ac8632c-c31c-7152-86f2-edfdfcd53d23"
-      }
-    }, {
-      "id": "282c943c-d3c8-564f-430f-d61ab0ad89bd",
-      "operation": {
-        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
-        "name": "SQL Column Transformation"
-      },
-      "parameters": {
-        "formula": "upper(x)",
-        "operate on": {
-          "multiple columns": {
-            "input columns": {
-              "selections": [{
-                "type": "columnList",
-                "values": ["Headquarter"]
-              }],
-              "excluding": false
-            }
-          }
+        "selected columns": {
+          "selections": [{
+            "type": "columnList",
+            "values": ["masked_advertising_id", "masked_user_id"]
+          }],
+          "excluding": true
         }
       }
     }, {
-      "id": "78dcb149-96e7-6abe-93c5-3e823f123d89",
-      "operation": {
-        "id": "06374446-3138-4cf7-9682-f884990f3a60",
-        "name": "Join"
-      },
-      "parameters": {
-        "join columns": [{
-          "left column": {
-            "type": "column",
-            "value": "symbol"
-          },
-          "right column": {
-            "type": "column",
-            "value": "Ticker_symbol"
-          }
-        }]
-      }
-    }, {
-      "id": "d723ae59-fc3c-9162-2ad1-4b324d4d6ffb",
+      "id": "868d2486-eb10-0a0e-6e51-4f084330705c",
       "operation": {
         "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
         "name": "SQL Transformation"
       },
       "parameters": {
-        "dataframe id": "df",
-        "expression": "select newdate, symbol, open,close from df"
+        "dataframe id": "act",
+        "expression": "SELECT advertising_id FROM act WHERE advertising_id LIKE 'M%'"
+      }
+    }, {
+      "id": "3677e467-f564-ee84-7a07-cb6709701801",
+      "operation": {
+        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
+        "name": "Filter Columns"
+      },
+      "parameters": {
+        "selected columns": {
+          "selections": [{
+            "type": "columnList",
+            "values": ["a_id", "u_id"]
+          }],
+          "excluding": false
+        }
+      }
+    }, {
+      "id": "19499c0a-8d52-e5ed-3065-9da84c5c04c7",
+      "operation": {
+        "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
+        "name": "SQL Transformation"
+      },
+      "parameters": {
+        "expression": "SELECT * FROM df"
+      }
+    }, {
+      "id": "fa247560-a22f-22ec-5636-b1510f12635f",
+      "operation": {
+        "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
+        "name": "SQL Transformation"
+      },
+      "parameters": {
+        "expression": "select * , sha2('advertising_id',256)  as a_id, sha2('user_id',256)  as u_id\nfrom df"
       }
     }],
     "connections": [{
       "from": {
-        "nodeId": "282c943c-d3c8-564f-430f-d61ab0ad89bd",
+        "nodeId": "868d2486-eb10-0a0e-6e51-4f084330705c",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "78dcb149-96e7-6abe-93c5-3e823f123d89",
-        "portIndex": 1
-      }
-    }, {
-      "from": {
-        "nodeId": "ea5e335b-d877-7410-b901-01c7ef76cc9f",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "55f65626-49f8-a9d8-f4bf-c6108058aca6",
+        "nodeId": "03f58e08-920e-3914-c8f1-f2f711bd6185",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "13c59bad-a2b1-ca20-15fd-b2ef6df2de77",
+        "nodeId": "5d737576-f439-0819-d0c7-6642485812ef",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "d723ae59-fc3c-9162-2ad1-4b324d4d6ffb",
+        "nodeId": "19499c0a-8d52-e5ed-3065-9da84c5c04c7",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "7da585cb-6351-b39f-2464-96a8ca0233ad",
+        "nodeId": "eb5b884d-2f51-f80d-b882-8e1d314c5b05",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "13c59bad-a2b1-ca20-15fd-b2ef6df2de77",
+        "nodeId": "868d2486-eb10-0a0e-6e51-4f084330705c",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "d723ae59-fc3c-9162-2ad1-4b324d4d6ffb",
+        "nodeId": "19499c0a-8d52-e5ed-3065-9da84c5c04c7",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "78dcb149-96e7-6abe-93c5-3e823f123d89",
+        "nodeId": "fa247560-a22f-22ec-5636-b1510f12635f",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "78dcb149-96e7-6abe-93c5-3e823f123d89",
+        "nodeId": "fa247560-a22f-22ec-5636-b1510f12635f",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "ea5e335b-d877-7410-b901-01c7ef76cc9f",
+        "nodeId": "3677e467-f564-ee84-7a07-cb6709701801",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "99c37b47-ce55-31a4-672c-530e6844b3c6",
+        "nodeId": "eb5b884d-2f51-f80d-b882-8e1d314c5b05",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "282c943c-d3c8-564f-430f-d61ab0ad89bd",
+        "nodeId": "5d737576-f439-0819-d0c7-6642485812ef",
         "portIndex": 0
       }
     }]
   },
   "thirdPartyData": {
     "gui": {
-      "name": "sql_col",
+      "name": "sql_trans",
       "description": "",
       "nodes": {
-        "d723ae59-fc3c-9162-2ad1-4b324d4d6ffb": {
+        "868d2486-eb10-0a0e-6e51-4f084330705c": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7028,
-            "y": 8456
+            "x": 7604,
+            "y": 8950
           }
         },
-        "7da585cb-6351-b39f-2464-96a8ca0233ad": {
+        "eb5b884d-2f51-f80d-b882-8e1d314c5b05": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7038,
-            "y": 8230
+            "x": 7742,
+            "y": 8858
           }
         },
-        "13c59bad-a2b1-ca20-15fd-b2ef6df2de77": {
+        "19499c0a-8d52-e5ed-3065-9da84c5c04c7": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7010,
-            "y": 8332
+            "x": 7885,
+            "y": 9031
           }
         },
-        "282c943c-d3c8-564f-430f-d61ab0ad89bd": {
+        "03f58e08-920e-3914-c8f1-f2f711bd6185": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7292,
-            "y": 8304
+            "x": 7635,
+            "y": 9050
           }
         },
-        "55f65626-49f8-a9d8-f4bf-c6108058aca6": {
+        "3677e467-f564-ee84-7a07-cb6709701801": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7235,
-            "y": 8647
+            "x": 7856,
+            "y": 9205
           }
         },
-        "78dcb149-96e7-6abe-93c5-3e823f123d89": {
+        "5d737576-f439-0819-d0c7-6642485812ef": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7238,
-            "y": 8413
+            "x": 7910,
+            "y": 8941
           }
         },
-        "99c37b47-ce55-31a4-672c-530e6844b3c6": {
+        "fa247560-a22f-22ec-5636-b1510f12635f": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7303,
-            "y": 8216
-          }
-        },
-        "ea5e335b-d877-7410-b901-01c7ef76cc9f": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7240,
-            "y": 8516
+            "x": 7908,
+            "y": 9123
           }
         }
       }
@@ -253,9 +208,14 @@
     "datasources": [{
       "accessLevel": "writeRead",
       "params": {
-        "name": "StockPrice",
-        "libraryFileParams": {
-          "libraryPath": "library://StockPrice.csv",
+        "name": "actives",
+        "libraryFileParams": null,
+        "downloadUri": null,
+        "googleSpreadsheetParams": null,
+        "jdbcParams": null,
+        "hdfsParams": null,
+        "externalFileParams": {
+          "url": "https://2weeks-landingbucket.s3.amazonaws.com/Actives_Staged_Result.csv",
           "fileFormat": "csv",
           "csvFileFormatParams": {
             "includeHeader": true,
@@ -264,68 +224,11 @@
             "customSeparator": null
           }
         },
-        "downloadUri": null,
-        "googleSpreadsheetParams": null,
-        "jdbcParams": null,
-        "hdfsParams": null,
-        "externalFileParams": null,
-        "datasourceType": "libraryFile",
+        "datasourceType": "externalFile",
         "visibility": "privateVisibility"
       },
-      "creationDateTime": "2023-03-02T04:06:29.798Z",
-      "id": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833",
-      "ownerName": "user",
-      "ownerId": "00000000-0000-0000-0000-000000000001"
-    }, {
-      "accessLevel": "writeRead",
-      "params": {
-        "name": "Stockcompanies",
-        "libraryFileParams": {
-          "libraryPath": "library://Stockcompanies.csv",
-          "fileFormat": "csv",
-          "csvFileFormatParams": {
-            "includeHeader": true,
-            "convert01ToBoolean": false,
-            "separatorType": "comma",
-            "customSeparator": null
-          }
-        },
-        "downloadUri": null,
-        "googleSpreadsheetParams": null,
-        "jdbcParams": null,
-        "hdfsParams": null,
-        "externalFileParams": null,
-        "datasourceType": "libraryFile",
-        "visibility": "privateVisibility"
-      },
-      "creationDateTime": "2023-03-02T04:06:40.632Z",
-      "id": "1ac8632c-c31c-7152-86f2-edfdfcd53d23",
-      "ownerName": "user",
-      "ownerId": "00000000-0000-0000-0000-000000000001"
-    }, {
-      "accessLevel": "writeRead",
-      "params": {
-        "name": "output1",
-        "libraryFileParams": {
-          "libraryPath": "library://output",
-          "fileFormat": "csv",
-          "csvFileFormatParams": {
-            "includeHeader": true,
-            "convert01ToBoolean": false,
-            "separatorType": "comma",
-            "customSeparator": null
-          }
-        },
-        "downloadUri": null,
-        "googleSpreadsheetParams": null,
-        "jdbcParams": null,
-        "hdfsParams": null,
-        "externalFileParams": null,
-        "datasourceType": "libraryFile",
-        "visibility": "privateVisibility"
-      },
-      "creationDateTime": "2023-02-20T12:16:02.448Z",
-      "id": "de1c3271-85f1-07b5-1f6a-868d81607185",
+      "creationDateTime": "2023-03-01T09:37:16.350Z",
+      "id": "43eb02ab-7e80-63b8-3b13-6e711666d6e9",
       "ownerName": "user",
       "ownerId": "00000000-0000-0000-0000-000000000001"
     }]
@@ -333,7 +236,7 @@
   "variables": {
 
   },
-  "id": "5ddedbdd-75a3-4922-b62c-b60a58fe5ea2",
+  "id": "b77dc6e5-bd10-4206-9622-af88a740d741",
   "metadata": {
     "type": "batch",
     "apiVersion": "1.4.3"

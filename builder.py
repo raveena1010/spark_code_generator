@@ -135,8 +135,9 @@ def update_schema_after_sql_transformation(schema,formula):
             pass    
         else:
             new_list.append(list_cols[i])
-        
-    for i in list_cols:
+
+       
+    for i in new_list:
         i = i.strip()
         if '*' in i:
             for i in schema:
