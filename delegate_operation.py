@@ -109,7 +109,8 @@ class Node_Operation:
         node_id = node['id']
         datasource_id = node['parameters']['data source']
         df_name = self.dataframe_name[node_id]
-        set_df_name_for_child(self,node_id, df_name) # not needed *****
+        parents_id = self.pn_obj.child_parent[node_id]
+        parent_name = self.dataframe_name[parents_id[0]]
         if self.is_datasource_inhand:
             datasource = self.datasource_dict[datasource_id]
             data_from = datasource['params']['datasourceType'] + "Params"
@@ -119,8 +120,6 @@ class Node_Operation:
             
             if 'library' in url:
                 url = url.split('://')[-1] + '_'+str(random.randint(1,30))
-                #url = input("Give file location of {0} data ".format(datasource_name)).strip()
-                #url = cleanse_data(url)
                 if self.s3_path:
                     url = self.s3_path + '/' + url
                 print(f"-----  Output for  {datasource_name} will be in: "+url+'   --------')
@@ -130,9 +129,9 @@ class Node_Operation:
             file_format = input(f"Give file_format of {df_name} ").strip()
             file_format = cleanse_data(file_format)
         if file_format == 'csv':
-            code = f"{df_name}.write.mode('overwrite').option('header',True).option('delimiter',',').option('inferschema',True).csv('{url}')"
+            code = f"{parent_name}.write.mode('overwrite').option('header',True).option('delimiter',',').option('inferschema',True).csv('{url}')"
         else:
-            code = f"{df_name}.write.mode('overwrite').{file_format}('{url}')"
+            code = f"{parent_name}.write.mode('overwrite').{file_format}('{url}')"
         self.code_file.write(code + '\n')
 
     def filter_rows(self, node):

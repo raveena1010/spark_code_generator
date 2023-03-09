@@ -1,7 +1,69 @@
 {
   "workflow": {
     "nodes": [{
-      "id": "edd7c4ec-5f42-3aa9-2258-693a3c684258",
+      "id": "13c59bad-a2b1-ca20-15fd-b2ef6df2de77",
+      "operation": {
+        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
+        "name": "SQL Column Transformation"
+      },
+      "parameters": {
+        "input column alias": "x",
+        "operate on": {
+          "multiple columns": {
+            "input columns": {
+              "selections": [{
+                "type": "columnList",
+                "values": ["date"]
+              }],
+              "excluding": false
+            },
+            "output": {
+              "append new columns": {
+                "column name prefix": "new"
+              }
+            }
+          }
+        }
+      }
+    }, {
+      "id": "7da585cb-6351-b39f-2464-96a8ca0233ad",
+      "operation": {
+        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
+        "name": "Read DataFrame"
+      },
+      "parameters": {
+        "data source": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833"
+      }
+    }, {
+      "id": "55f65626-49f8-a9d8-f4bf-c6108058aca6",
+      "operation": {
+        "id": "bf082da2-a0d9-4335-a62f-9804217a1436",
+        "name": "Write DataFrame"
+      },
+      "parameters": {
+        "data source": "de1c3271-85f1-07b5-1f6a-868d81607185"
+      }
+    }, {
+      "id": "ea5e335b-d877-7410-b901-01c7ef76cc9f",
+      "operation": {
+        "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
+        "name": "SQL Transformation"
+      },
+      "parameters": {
+        "dataframe id": "df",
+        "expression": "select * , sha2(symbol,256) as masked_symbol from df"
+      }
+    }, {
+      "id": "99c37b47-ce55-31a4-672c-530e6844b3c6",
+      "operation": {
+        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
+        "name": "Read DataFrame"
+      },
+      "parameters": {
+        "data source": "1ac8632c-c31c-7152-86f2-edfdfcd53d23"
+      }
+    }, {
+      "id": "282c943c-d3c8-564f-430f-d61ab0ad89bd",
       "operation": {
         "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
         "name": "SQL Column Transformation"
@@ -9,81 +71,19 @@
       "parameters": {
         "formula": "upper(x)",
         "operate on": {
-          "one column": {
-            "input column": {
-              "type": "column",
-              "value": "Company_Name"
+          "multiple columns": {
+            "input columns": {
+              "selections": [{
+                "type": "columnList",
+                "values": ["Headquarter"]
+              }],
+              "excluding": false
             }
           }
         }
       }
     }, {
-      "id": "bcc1c4d5-cb2c-1ddc-0864-8ff4ba9911f0",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "symbol = 'WLTW'"
-      }
-    }, {
-      "id": "e3c5f393-c309-9074-ed7c-c89750458c05",
-      "operation": {
-        "id": "9c3225d8-d430-48c0-a46e-fa83909ad054",
-        "name": "Projection"
-      },
-      "parameters": {
-        "projection columns": [{
-          "original column": {
-            "type": "column",
-            "value": "Security"
-          },
-          "rename column": {
-            "Yes": {
-              "column name": "Company_Name"
-            }
-          }
-        }, {
-          "original column": {
-            "type": "column",
-            "value": "Sector"
-          }
-        }, {
-          "original column": {
-            "type": "column",
-            "value": "Ticker_symbol"
-          }
-        }]
-      }
-    }, {
-      "id": "495f2737-3fd8-1664-61c8-0ec0455e7395",
-      "operation": {
-        "id": "bf082da2-a0d9-4335-a62f-9804217a1436",
-        "name": "Write DataFrame"
-      },
-      "parameters": {
-        "data source": "33e29e12-359c-c61f-74a1-d339444804da"
-      }
-    }, {
-      "id": "271dd097-506b-14ed-926a-36839ee44d31",
-      "operation": {
-        "id": "6534f3f4-fa3a-49d9-b911-c213d3da8b5d",
-        "name": "Filter Columns"
-      },
-      "parameters": {
-        "selected columns": {
-          "selections": [{
-            "type": "columnList",
-            "values": ["volume", "low"]
-          }, {
-            "type": "indexRange",
-            "values": [4, 5]
-          }],
-          "excluding": true
-        }
-      }
-    }, {
-      "id": "e7ed4607-778d-9c3b-06df-8049f2484bea",
+      "id": "78dcb149-96e7-6abe-93c5-3e823f123d89",
       "operation": {
         "id": "06374446-3138-4cf7-9682-f884990f3a60",
         "name": "Join"
@@ -101,245 +101,148 @@
         }]
       }
     }, {
-      "id": "bbfae5ca-e3c5-0e3e-d9d6-bca9f987491c",
+      "id": "d723ae59-fc3c-9162-2ad1-4b324d4d6ffb",
       "operation": {
-        "id": "012876d9-7a72-47f9-98e4-8ed26db14d6d",
-        "name": "SQL Column Transformation"
+        "id": "6cba4400-d966-4a2a-8356-b37f37b4c73f",
+        "name": "SQL Transformation"
       },
       "parameters": {
-        "formula": "int(x)",
-        "operate on": {
-          "multiple columns": {
-            "input columns": {
-              "selections": [{
-                "type": "columnList",
-                "values": ["open", "close"]
-              }],
-              "excluding": false
-            }
-          }
-        }
-      }
-    }, {
-      "id": "d99b6b88-7cd6-ea29-0756-47e7dc6daa04",
-      "operation": {
-        "id": "bf082da2-a0d9-4335-a62f-9804217a1436",
-        "name": "Write DataFrame"
-      },
-      "parameters": {
-        "data source": "de1c3271-85f1-07b5-1f6a-868d81607185"
-      }
-    }, {
-      "id": "7a37eab3-9120-3a2d-4c69-54e8a5be1416",
-      "operation": {
-        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
-        "name": "Read DataFrame"
-      },
-      "parameters": {
-        "data source": "06d0f90e-e7e3-b3d3-f1bc-339aa037d833"
-      }
-    }, {
-      "id": "2e03806e-273b-f9a6-8d6b-68c67cef185a",
-      "operation": {
-        "id": "7d7eddfa-c9be-48c3-bb8c-5f7cc59b403a",
-        "name": "Filter Rows"
-      },
-      "parameters": {
-        "condition": "open <200 and close >200 "
-      }
-    }, {
-      "id": "19cab888-aff8-02ce-9914-df65bd30007c",
-      "operation": {
-        "id": "1a3b32f0-f56d-4c44-a396-29d2dfd43423",
-        "name": "Read DataFrame"
-      },
-      "parameters": {
-        "data source": "1ac8632c-c31c-7152-86f2-edfdfcd53d23"
+        "dataframe id": "df",
+        "expression": "select newdate, symbol, open,close from df"
       }
     }],
     "connections": [{
       "from": {
-        "nodeId": "271dd097-506b-14ed-926a-36839ee44d31",
+        "nodeId": "282c943c-d3c8-564f-430f-d61ab0ad89bd",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "bcc1c4d5-cb2c-1ddc-0864-8ff4ba9911f0",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "2e03806e-273b-f9a6-8d6b-68c67cef185a",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "bbfae5ca-e3c5-0e3e-d9d6-bca9f987491c",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "edd7c4ec-5f42-3aa9-2258-693a3c684258",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "e7ed4607-778d-9c3b-06df-8049f2484bea",
+        "nodeId": "78dcb149-96e7-6abe-93c5-3e823f123d89",
         "portIndex": 1
       }
     }, {
       "from": {
-        "nodeId": "7a37eab3-9120-3a2d-4c69-54e8a5be1416",
+        "nodeId": "ea5e335b-d877-7410-b901-01c7ef76cc9f",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "271dd097-506b-14ed-926a-36839ee44d31",
+        "nodeId": "55f65626-49f8-a9d8-f4bf-c6108058aca6",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "bcc1c4d5-cb2c-1ddc-0864-8ff4ba9911f0",
+        "nodeId": "13c59bad-a2b1-ca20-15fd-b2ef6df2de77",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "495f2737-3fd8-1664-61c8-0ec0455e7395",
+        "nodeId": "d723ae59-fc3c-9162-2ad1-4b324d4d6ffb",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "19cab888-aff8-02ce-9914-df65bd30007c",
+        "nodeId": "7da585cb-6351-b39f-2464-96a8ca0233ad",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "e3c5f393-c309-9074-ed7c-c89750458c05",
+        "nodeId": "13c59bad-a2b1-ca20-15fd-b2ef6df2de77",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "bbfae5ca-e3c5-0e3e-d9d6-bca9f987491c",
+        "nodeId": "d723ae59-fc3c-9162-2ad1-4b324d4d6ffb",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "e7ed4607-778d-9c3b-06df-8049f2484bea",
+        "nodeId": "78dcb149-96e7-6abe-93c5-3e823f123d89",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "e3c5f393-c309-9074-ed7c-c89750458c05",
+        "nodeId": "78dcb149-96e7-6abe-93c5-3e823f123d89",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "edd7c4ec-5f42-3aa9-2258-693a3c684258",
+        "nodeId": "ea5e335b-d877-7410-b901-01c7ef76cc9f",
         "portIndex": 0
       }
     }, {
       "from": {
-        "nodeId": "e7ed4607-778d-9c3b-06df-8049f2484bea",
+        "nodeId": "99c37b47-ce55-31a4-672c-530e6844b3c6",
         "portIndex": 0
       },
       "to": {
-        "nodeId": "d99b6b88-7cd6-ea29-0756-47e7dc6daa04",
-        "portIndex": 0
-      }
-    }, {
-      "from": {
-        "nodeId": "271dd097-506b-14ed-926a-36839ee44d31",
-        "portIndex": 0
-      },
-      "to": {
-        "nodeId": "2e03806e-273b-f9a6-8d6b-68c67cef185a",
+        "nodeId": "282c943c-d3c8-564f-430f-d61ab0ad89bd",
         "portIndex": 0
       }
     }]
   },
   "thirdPartyData": {
     "gui": {
-      "name": "workflow1",
+      "name": "sql_col",
       "description": "",
       "nodes": {
-        "2e03806e-273b-f9a6-8d6b-68c67cef185a": {
+        "d723ae59-fc3c-9162-2ad1-4b324d4d6ffb": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7490,
-            "y": 8755
+            "x": 7028,
+            "y": 8456
           }
         },
-        "495f2737-3fd8-1664-61c8-0ec0455e7395": {
+        "7da585cb-6351-b39f-2464-96a8ca0233ad": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7245,
-            "y": 8891
+            "x": 7038,
+            "y": 8230
           }
         },
-        "19cab888-aff8-02ce-9914-df65bd30007c": {
+        "13c59bad-a2b1-ca20-15fd-b2ef6df2de77": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7789,
-            "y": 8576
+            "x": 7010,
+            "y": 8332
           }
         },
-        "271dd097-506b-14ed-926a-36839ee44d31": {
+        "282c943c-d3c8-564f-430f-d61ab0ad89bd": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7501,
-            "y": 8657
+            "x": 7292,
+            "y": 8304
           }
         },
-        "7a37eab3-9120-3a2d-4c69-54e8a5be1416": {
+        "55f65626-49f8-a9d8-f4bf-c6108058aca6": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7514,
-            "y": 8574
+            "x": 7235,
+            "y": 8647
           }
         },
-        "e7ed4607-778d-9c3b-06df-8049f2484bea": {
+        "78dcb149-96e7-6abe-93c5-3e823f123d89": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7688,
-            "y": 8873
+            "x": 7238,
+            "y": 8413
           }
         },
-        "e3c5f393-c309-9074-ed7c-c89750458c05": {
+        "99c37b47-ce55-31a4-672c-530e6844b3c6": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7782,
-            "y": 8671
+            "x": 7303,
+            "y": 8216
           }
         },
-        "bcc1c4d5-cb2c-1ddc-0864-8ff4ba9911f0": {
+        "ea5e335b-d877-7410-b901-01c7ef76cc9f": {
           "uiName": "",
           "color": "#00B1EB",
           "coordinates": {
-            "x": 7260,
-            "y": 8762
-          }
-        },
-        "d99b6b88-7cd6-ea29-0756-47e7dc6daa04": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7701,
-            "y": 8975
-          }
-        },
-        "bbfae5ca-e3c5-0e3e-d9d6-bca9f987491c": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7416,
-            "y": 8869
-          }
-        },
-        "edd7c4ec-5f42-3aa9-2258-693a3c684258": {
-          "uiName": "",
-          "color": "#00B1EB",
-          "coordinates": {
-            "x": 7783,
-            "y": 8768
+            "x": 7240,
+            "y": 8516
           }
         }
       }
@@ -348,32 +251,6 @@
 
     },
     "datasources": [{
-      "accessLevel": "writeRead",
-      "params": {
-        "name": "Stockcompanies",
-        "libraryFileParams": {
-          "libraryPath": "library://Stockcompanies.csv",
-          "fileFormat": "csv",
-          "csvFileFormatParams": {
-            "includeHeader": true,
-            "convert01ToBoolean": false,
-            "separatorType": "comma",
-            "customSeparator": null
-          }
-        },
-        "downloadUri": null,
-        "googleSpreadsheetParams": null,
-        "jdbcParams": null,
-        "hdfsParams": null,
-        "externalFileParams": null,
-        "datasourceType": "libraryFile",
-        "visibility": "privateVisibility"
-      },
-      "creationDateTime": "2023-03-02T04:06:40.632Z",
-      "id": "1ac8632c-c31c-7152-86f2-edfdfcd53d23",
-      "ownerName": "user",
-      "ownerId": "00000000-0000-0000-0000-000000000001"
-    }, {
       "accessLevel": "writeRead",
       "params": {
         "name": "StockPrice",
@@ -402,6 +279,32 @@
     }, {
       "accessLevel": "writeRead",
       "params": {
+        "name": "Stockcompanies",
+        "libraryFileParams": {
+          "libraryPath": "library://Stockcompanies.csv",
+          "fileFormat": "csv",
+          "csvFileFormatParams": {
+            "includeHeader": true,
+            "convert01ToBoolean": false,
+            "separatorType": "comma",
+            "customSeparator": null
+          }
+        },
+        "downloadUri": null,
+        "googleSpreadsheetParams": null,
+        "jdbcParams": null,
+        "hdfsParams": null,
+        "externalFileParams": null,
+        "datasourceType": "libraryFile",
+        "visibility": "privateVisibility"
+      },
+      "creationDateTime": "2023-03-02T04:06:40.632Z",
+      "id": "1ac8632c-c31c-7152-86f2-edfdfcd53d23",
+      "ownerName": "user",
+      "ownerId": "00000000-0000-0000-0000-000000000001"
+    }, {
+      "accessLevel": "writeRead",
+      "params": {
         "name": "output1",
         "libraryFileParams": {
           "libraryPath": "library://output",
@@ -425,38 +328,12 @@
       "id": "de1c3271-85f1-07b5-1f6a-868d81607185",
       "ownerName": "user",
       "ownerId": "00000000-0000-0000-0000-000000000001"
-    }, {
-      "accessLevel": "writeRead",
-      "params": {
-        "name": "staged_result",
-        "libraryFileParams": {
-          "libraryPath": "library://staged_result",
-          "fileFormat": "csv",
-          "csvFileFormatParams": {
-            "includeHeader": true,
-            "convert01ToBoolean": false,
-            "separatorType": "comma",
-            "customSeparator": null
-          }
-        },
-        "downloadUri": null,
-        "googleSpreadsheetParams": null,
-        "jdbcParams": null,
-        "hdfsParams": null,
-        "externalFileParams": null,
-        "datasourceType": "libraryFile",
-        "visibility": "privateVisibility"
-      },
-      "creationDateTime": "2023-03-02T09:00:28.827Z",
-      "id": "33e29e12-359c-c61f-74a1-d339444804da",
-      "ownerName": "user",
-      "ownerId": "00000000-0000-0000-0000-000000000001"
     }]
   },
   "variables": {
 
   },
-  "id": "6e1806e3-1b02-4075-82e9-b3d5d231470b",
+  "id": "5ddedbdd-75a3-4922-b62c-b60a58fe5ea2",
   "metadata": {
     "type": "batch",
     "apiVersion": "1.4.3"

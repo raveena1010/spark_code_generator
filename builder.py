@@ -131,32 +131,29 @@ def update_schema_after_sql_transformation(schema,formula):
         if '(' in list_cols[i] and ')' not in list_cols[i] :
             y = list_cols[i] + ','+list_cols[i+1]
             new_list.append(y)
-        
         elif '(' not in list_cols[i] and ')' in list_cols[i]:
-            pass
-            
+            pass    
         else:
             new_list.append(list_cols[i])
-            
-
-
-        list_cols = formula[select_index:from_index].split(',')
-        for i in list_cols:
-            i = i.strip()
-            if '*' in i:
-                for i in schema:
-                    new_schema[i] = schema[i]
-            for j in existing_cols:
-                if j.lower() in i.lower():
-                    if 'as' in i.lower():
-                        as_index = i.lower().find('as')
-                        alias = i[as_index+2:].strip()
-                        new_schema[alias] = schema[j]
+        
+    for i in list_cols:
+        i = i.strip()
+        if '*' in i:
+            for i in schema:
+                new_schema[i] = schema[i]
+        for j in existing_cols:
+            if j.lower() in i.lower():
+                if 'as' in i.lower():
+                    as_index = i.lower().find('as')
+                    alias = i[as_index+2:].strip()
+                    new_schema[alias] = schema[j]
+                else:
+                    if j.lower() == i.lower():
+                        new_schema[j] = schema[j]   
                     else:
-                        if j.lower() == i.lower():
-                            new_schema[j] = schema[j]   
-                        else:
-                            i = i[:from_index].strip()
-                            new_schema[i] = schema[j]                      
-        return new_schema               
+                        i = i[:from_index].strip()
+                        new_schema[i] = schema[j]     
+
+    print(new_schema,'lkjhg')                                     
+    return new_schema               
 
