@@ -123,6 +123,9 @@ def update_schema_after_sql_transformation(schema,formula):
     new_schema = {}
     existing_cols = list(schema.keys())
     new_list, from_index = create_list_of_cols(formula)
+    print(new_list)
+    print(existing_cols)
+    as_var = ' as '
     for i in new_list:
         i = i.strip()
         if '*' in i:
@@ -130,9 +133,16 @@ def update_schema_after_sql_transformation(schema,formula):
                 new_schema[i] = schema[i]
         for j in existing_cols:
             if j.lower() in i.lower():
-                if 'as' in i.lower():
-                    as_index = i.lower().find('as')
-                    alias = i[as_index+2:].strip()
+                 #sha2(ad_id,1) as id , cast(open as int)
+                if as_var in i.lower():
+                    as_index = i.lower().find(as_var)
+                    close_bracket_index =  i.lower().find(')')
+                    if as_index > close_bracket_index:
+                        alias = i[as_index+3:].strip()
+                    elif close_bracket_index >  as_index :
+                        #cast(open as int)
+                        open_bracket_index = i.lower().find('(')
+                        alias = i[open_bracket_index+1 :as_index].strip()
                     new_schema[alias] = schema[j]
 
                 elif j.lower() == i.lower():
@@ -141,7 +151,7 @@ def update_schema_after_sql_transformation(schema,formula):
                 else:
                     i = i[:from_index].strip()
                     new_schema[i] = schema[j]   
-            break              
+                break              
 
     print(new_schema,'lkjhg')                                     
     return new_schema               
@@ -153,6 +163,7 @@ def create_list_of_cols(formula):
     list_cols = formula[select_index:from_index].split(',')
     new_list = []
     for i in range(len(list_cols)):
+        list_cols[i] = list_cols[i].strip()
         if '(' in list_cols[i] and ')' not in list_cols[i] :
             y = list_cols[i] + ','+list_cols[i+1]
             new_list.append(y)

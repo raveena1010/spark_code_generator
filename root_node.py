@@ -65,12 +65,15 @@ class Get_Root_Node:
             valid_1st_node = []
             for i in self.read_operations:
                 valid = True
-                for child in self.relation_dict[i]:
-                    for ele in self.relation_dict:
-                        if child in self.relation_dict[ele] and ele not in self.read_operations:
-                            valid = False
-                if valid:
-                    valid_1st_node.append(i)
+                if i in self.relation_dict:
+                    for child in self.relation_dict[i]:
+                        for ele in self.relation_dict:
+                            if child in self.relation_dict[ele] and ele not in self.read_operations:
+                                valid = False
+                    if valid:
+                        valid_1st_node.append(i)
+                else:
+                    valid_1st_node.append(i)      
         return valid_1st_node
 
 

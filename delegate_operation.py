@@ -348,7 +348,8 @@ class Node_Operation:
         node_id = node['id']
         df_name = self.dataframe_name[node_id]
         set_df_name_for_child(self,node_id,df_name)
-        formula = node['parameters'].get('formula')
+        formula = node['parameters'].get('formula','')
+        formula  = return_valid_exp(formula)
         parents_id = self.pn_obj.child_parent[node_id]
         parent_name = self.dataframe_name[parents_id[0]]
         schema = self.cached_df_schema[parent_name]
@@ -381,7 +382,8 @@ class Node_Operation:
         else:
             col = parent_columns[operate_on['one column']['input column']['value']]               
         column = new_col_alias+col
-        new_schema[column] = schema[col]
+        if col in schema:
+            new_schema[column] = schema[col]
 
         if formula:
             col = check_column_is_valid(col)
@@ -406,7 +408,8 @@ class Node_Operation:
             x = formula.find('(',1)
         for col in required_cols:
             column = new_col_alias+col
-            new_schema[column] = schema[col]
+            if col in schema:
+                new_schema[column] = schema[col]
             if formula:
                 col = check_column_is_valid(col)
                 formula1 = formula[:x] + formula[x:].replace(input_col_alias,col) 
@@ -425,9 +428,8 @@ class Node_Operation:
         parent_name = self.dataframe_name[parents_id[0]]
         schema = self.cached_df_schema[parent_name]
         df = node[ "parameters"].get('dataframe id','df')
-        expression = return_valid_exp(expression)
-        expression = re.sub('["]', "'",expression) 
         if expression:
+            expression = return_valid_exp(expression)
             register_table = f'{parent_name}.registerTempTable("{df}")'
             self.code_file.write(register_table + '\n')
             code = f'{df_name} = spark.sql("{expression}")'
@@ -435,6 +437,31 @@ class Node_Operation:
 
         new_schema = update_schema_after_sql_transformation(schema,expression)  
         self.cached_df_schema[df_name] = new_schema
+
+    def sql_combine(self,node):
+        new_schema = {}
+        node_id = node['id']
+        left_df_id = node['parameters']["Left dataframe id"]
+        right_df_id = node['parameters']["Right dataframe id"]
+        expression = node[ "parameters"].get('expression','')
+        parents_id = self.pn_obj.child_parent[node_id] 
+        left_parent_name , right_parent_name  = find_left_right_parent(self,node_id,parents_id)
+        left_parent_schema = self.cached_df_schema[left_parent_name]
+        right_parent_schema = self.cached_df_schema[right_parent_name]
+        df_name = left_parent_name+'_'+right_parent_name+'_'+'sql_combine'
+        if df_name in self.dataframe_name.values():
+            df_name = df_name + str(random.randint(1,30))
+        self.dataframe_name[node_id] = df_name 
+        set_df_name_for_child(self,node_id,df_name)
+        if expression:
+            register_left_table = f'{left_parent_name}.registerTempTable("{left_df_id}")'
+            self.code_file.write(register_left_table + '\n')
+            register_right_table = f'{right_parent_name}.registerTempTable("{right_df_id}")'
+            self.code_file.write(register_right_table + '\n')
+            code = f'{df_name} = spark.sql("{expression}")'
+            self.code_file.write(code + '\n')
+        new_schema = update_schema_after_sql_combine(left_parent_schema ,right_parent_schema ,expression,left_df_id, right_df_id)  
+        self.cached_df_schema[df_name] = new_schema    
         
     def projection(self,node):
         project_schema = {}

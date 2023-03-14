@@ -75,15 +75,18 @@ class Generate_SparkCode:
                             queue.append(child)
                             node_details = self.dict_operation[child]
                             operation_id = node_details['operation']['id']
-                            operation_to_do = operations_dict[operation_id]
-                            fun_to_call = [operation_to_do, node_details]
-                            delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
+                            if operation_id in operations_dict:
+                                operation_to_do = operations_dict[operation_id]
+                                fun_to_call = [operation_to_do, node_details]
+                                delegate_operation.Node_Operation.get_operation(del_obj, fun_to_call)
+                            else:
+                                pass    
                             self.visited[child] = True
                             #print('col',del_obj.cached_df_schema)
 
 
 
 job = Generate_SparkCode()
-#print("Schema:",del_obj.cached_df_schema)
+print("Schema:",del_obj.cached_df_schema)
 #print("Df name:",del_obj.dataframe_name )
 

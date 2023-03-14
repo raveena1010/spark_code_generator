@@ -41,6 +41,8 @@ def return_valid_df_name(df_name):
     return  re.sub("[^a-zA-Z0-9_]", "", df_name)   
 
 def return_valid_exp(exp):
+   exp = exp.strip()
+   exp = re.sub('["]', "'",exp)
    return re.sub("[\n\r]", " ", exp) 
 
 def check_column_is_valid(col):
